@@ -89,6 +89,42 @@ font[color="#47d459"], font[color="#ee0000"]{
 .subnote{margin:25px 0;padding:14px 18px;border-radius:10px;background:#fff7d6;border-left:8px solid #ffb300;font-weight:700}
 mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
 .backtop{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;text-decoration:none;padding:12px 15px;border-radius:999px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+
+.command-grid{
+    display:grid;
+    gap:14px;
+    margin-top:22px;
+}
+.command-card{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:16px 18px;
+    background:#fafafa;
+}
+.command-card code{
+    display:block;
+    background:#111;
+    color:#f4f4f4;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:16px;
+    overflow-x:auto;
+    margin-bottom:8px;
+    font-family:Consolas, Monaco, monospace;
+}
+.command-card p{
+    margin:0;
+    font-size:16px;
+}
+.command-group{
+    margin-top:34px;
+    padding-top:10px;
+    border-top:3px solid #111;
+}
+.command-group h2{
+    margin-bottom:14px;
+}
+
 </style>
 </head>
 <body>
@@ -107,7 +143,8 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
             <a href="#dhcp">DHCP</a>
             <a href="#nginx-klasyczna">Nginx klasyczna</a>
             <a href="#nginx-aliasy">Nginx aliasy</a>
-        </div>
+        
+            <a href="#komendy">Komendy</a></div>
     </div>
     <section id="sekcja1" class="doc-section"><h1 class="big-title">SKRÓCONA INSTRUKCJA - WERSJA PIERWSZA</h1><h2 id="adresacja" class="anchor-title">Adresacja - RTR, VM01, VM02</h2><p style="line-height: 116%; margin-bottom: 0.11in">
 <img class="doc-image" height="193" src="img/obraz_01.png" width="605"/>
@@ -1573,5 +1610,126 @@ function searchText(q){
 }
 bindSearch();
 </script>
+
+    <hr class="section-divider">
+
+    <section id="komendy" class="doc-section">
+        <h1 class="big-title">KOMENDY</h1>
+        <div class="subnote">Najczęściej używane komendy Linux — szybka ściąga do poruszania się po systemie, edycji plików, sieci i diagnostyki VM.</div>
+
+        <div class="command-group">
+            <h2>Poruszanie się po katalogach</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>pwd</code><p>Pokazuje aktualny katalog, w którym teraz jesteś.</p></div>
+                <div class="command-card"><code>ls</code><p>Pokazuje pliki i foldery w aktualnym katalogu.</p></div>
+                <div class="command-card"><code>ls -l</code><p>Pokazuje pliki w formie szczegółowej: uprawnienia, właściciel, rozmiar i data.</p></div>
+                <div class="command-card"><code>ls -la</code><p>Pokazuje szczegółową listę razem z plikami ukrytymi, czyli zaczynającymi się od kropki.</p></div>
+                <div class="command-card"><code>cd /etc</code><p>Przechodzi do katalogu <b>/etc</b>, gdzie często są pliki konfiguracyjne.</p></div>
+                <div class="command-card"><code>cd ..</code><p>Cofa o jeden katalog wyżej.</p></div>
+                <div class="command-card"><code>cd ~</code><p>Przechodzi do katalogu domowego aktualnego użytkownika.</p></div>
+                <div class="command-card"><code>cd /</code><p>Przechodzi do głównego katalogu systemu.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Tworzenie i usuwanie plików/katalogów</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>mkdir nazwa</code><p>Tworzy nowy katalog o podanej nazwie.</p></div>
+                <div class="command-card"><code>mkdir -p /var/www/12.net</code><p>Tworzy cały katalog wraz z brakującymi katalogami po drodze.</p></div>
+                <div class="command-card"><code>touch plik.txt</code><p>Tworzy pusty plik albo aktualizuje datę istniejącego pliku.</p></div>
+                <div class="command-card"><code>rm plik.txt</code><p>Usuwa wskazany plik.</p></div>
+                <div class="command-card"><code>rm -r katalog</code><p>Usuwa katalog razem z zawartością.</p></div>
+                <div class="command-card"><code>cp plik kopia</code><p>Kopiuje plik do nowej lokalizacji albo pod nową nazwą.</p></div>
+                <div class="command-card"><code>mv stara_nazwa nowa_nazwa</code><p>Zmienia nazwę pliku albo przenosi plik do innego katalogu.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Wyszukiwanie plików i tekstu</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>find / -name "interfaces"</code><p>Szuka pliku o nazwie <b>interfaces</b> w całym systemie.</p></div>
+                <div class="command-card"><code>find /etc -name "*.conf"</code><p>Szuka plików konfiguracyjnych z końcówką <b>.conf</b> w katalogu <b>/etc</b>.</p></div>
+                <div class="command-card"><code>find / -name "*.cfg"</code><p>Szuka plików z końcówką <b>.cfg</b> w całym systemie.</p></div>
+                <div class="command-card"><code>grep -R "10.41.12.254" /etc</code><p>Szuka tekstu <b>10.41.12.254</b> we wszystkich plikach w katalogu <b>/etc</b>.</p></div>
+                <div class="command-card"><code>history | grep iptables</code><p>Przeszukuje historię komend i pokazuje wcześniejsze komendy z <b>iptables</b>.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Wyświetlanie zawartości plików</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>cat plik.txt</code><p>Wyświetla całą zawartość pliku w terminalu.</p></div>
+                <div class="command-card"><code>less plik.txt</code><p>Otwiera plik do wygodnego przewijania. Wyjście: klawisz <b>q</b>.</p></div>
+                <div class="command-card"><code>head plik.txt</code><p>Pokazuje początek pliku.</p></div>
+                <div class="command-card"><code>tail plik.txt</code><p>Pokazuje końcówkę pliku.</p></div>
+                <div class="command-card"><code>tail -f /var/log/syslog</code><p>Pokazuje logi na żywo, przydatne przy diagnozie usług.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Edycja plików</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>nano /etc/network/interfaces</code><p>Otwiera plik konfiguracji sieci w edytorze nano.</p></div>
+                <div class="command-card"><code>CTRL + O</code><p>Zapisuje plik w nano.</p></div>
+                <div class="command-card"><code>ENTER</code><p>Potwierdza nazwę pliku podczas zapisu w nano.</p></div>
+                <div class="command-card"><code>CTRL + X</code><p>Wychodzi z edytora nano.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Sieć i diagnostyka</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>ip a</code><p>Pokazuje interfejsy sieciowe i przypisane adresy IP.</p></div>
+                <div class="command-card"><code>ip route</code><p>Pokazuje trasę domyślną i tablicę routingu.</p></div>
+                <div class="command-card"><code>ping 10.41.12.254</code><p>Sprawdza połączenie z routerem RTR w sieci LAN.</p></div>
+                <div class="command-card"><code>ping 8.8.8.8</code><p>Sprawdza, czy działa wyjście do Internetu po IP.</p></div>
+                <div class="command-card"><code>nslookup google.com</code><p>Sprawdza, czy działa rozwiązywanie nazw DNS.</p></div>
+                <div class="command-card"><code>curl http://localhost</code><p>Testuje lokalny serwer WWW na danej maszynie.</p></div>
+                <div class="command-card"><code>curl -H "Host: 12.net" http://localhost</code><p>Testuje VirtualHost/ServerName dla konkretnej domeny.</p></div>
+                <div class="command-card"><code>ss -tulpn</code><p>Pokazuje otwarte porty i usługi nasłuchujące na systemie.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Usługi systemowe</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>systemctl status apache2</code><p>Sprawdza status usługi Apache.</p></div>
+                <div class="command-card"><code>systemctl restart apache2</code><p>Restartuje Apache po zmianach konfiguracji.</p></div>
+                <div class="command-card"><code>systemctl status nginx</code><p>Sprawdza status usługi Nginx.</p></div>
+                <div class="command-card"><code>systemctl restart networking</code><p>Restartuje konfigurację sieci.</p></div>
+                <div class="command-card"><code>systemctl restart bind9</code><p>Restartuje serwer DNS Bind9.</p></div>
+                <div class="command-card"><code>systemctl restart haproxy</code><p>Restartuje HAProxy po zmianie konfiguracji.</p></div>
+                <div class="command-card"><code>systemctl restart ssh</code><p>Restartuje SSH po zmianach w <b>sshd_config</b>.</p></div>
+                <div class="command-card"><code>systemctl enable apache2</code><p>Ustawia Apache, aby startował automatycznie po uruchomieniu systemu.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Uprawnienia, użytkownik i pakiety</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>whoami</code><p>Pokazuje, jako jaki użytkownik jesteś zalogowany.</p></div>
+                <div class="command-card"><code>sudo su</code><p>Przełącza na konto root, jeśli użytkownik ma uprawnienia sudo.</p></div>
+                <div class="command-card"><code>chmod 755 katalog</code><p>Ustawia uprawnienia katalogu: właściciel pełne, reszta odczyt i wejście.</p></div>
+                <div class="command-card"><code>chmod 644 plik</code><p>Ustawia typowe uprawnienia dla pliku tekstowego lub konfiguracyjnego.</p></div>
+                <div class="command-card"><code>chown root:root plik</code><p>Ustawia właściciela i grupę pliku na root.</p></div>
+                <div class="command-card"><code>apt update</code><p>Odświeża listę pakietów z repozytoriów.</p></div>
+                <div class="command-card"><code>apt install apache2 -y</code><p>Instaluje Apache bez pytania o potwierdzenie.</p></div>
+                <div class="command-card"><code>apt install nginx -y</code><p>Instaluje Nginx bez pytania o potwierdzenie.</p></div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Szybkie pomocne komendy</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>clear</code><p>Czyści ekran terminala.</p></div>
+                <div class="command-card"><code>history</code><p>Pokazuje historię wpisanych komend.</p></div>
+                <div class="command-card"><code>hostname</code><p>Pokazuje nazwę hosta/maszyny.</p></div>
+                <div class="command-card"><code>reboot</code><p>Restartuje system.</p></div>
+                <div class="command-card"><code>df -h</code><p>Pokazuje zajętość dysków w czytelnych jednostkach.</p></div>
+                <div class="command-card"><code>free -h</code><p>Pokazuje użycie pamięci RAM.</p></div>
+            </div>
+        </div>
+    </section>
+
 </body>
 </html>
