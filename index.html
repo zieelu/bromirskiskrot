@@ -125,6 +125,27 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
     margin-bottom:14px;
 }
 
+.command-card pre{
+    background:#111;
+    color:#f4f4f4;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:15px;
+    overflow-x:auto;
+    margin:8px 0 10px;
+    font-family:Consolas, Monaco, monospace;
+    white-space:pre;
+    line-height:1.35;
+}
+.vyos-warning{
+    margin:18px 0;
+    padding:14px 18px;
+    border-radius:10px;
+    background:#ffe6e6;
+    border-left:8px solid #e60000;
+    font-weight:700;
+}
+
 </style>
 </head>
 <body>
@@ -144,6 +165,7 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
             <a href="#nginx-klasyczna">Nginx klasyczna</a>
             <a href="#nginx-aliasy">Nginx aliasy</a>
         
+            <a href="#vyos">VyOS</a>
             <a href="#komendy">Komendy</a></div>
     </div>
     <section id="sekcja1" class="doc-section"><h1 class="big-title">SKRÓCONA INSTRUKCJA - WERSJA PIERWSZA</h1><h2 id="adresacja" class="anchor-title">Adresacja - RTR, VM01, VM02</h2><p style="line-height: 116%; margin-bottom: 0.11in">
@@ -1582,34 +1604,164 @@ Nginx:
 
 <a href="#" class="backtop">↑ góra</a>
 <script>
-const originalWrapper = document.querySelector('.wrapper').innerHTML;
-function bindSearch(){
-  const box=document.getElementById('searchBox');
-  if(!box) return;
-  box.addEventListener('keydown', function(e){ if(e.key==='Enter') searchText(this.value.trim()); });
+function clearMarks(){
+  document.querySelectorAll('mark').forEach(mark=>{
+    const parent = mark.parentNode;
+    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+    parent.normalize();
+  });
 }
-function searchText(q){
-  if(!q) return;
-  document.querySelector('.wrapper').innerHTML = originalWrapper;
-  bindSearch();
-  const root=document.querySelector('.wrapper');
-  const esc=q.replace(/[.*+?^${}()|[\]\]/g,'\$&');
-  const re=new RegExp(esc,'gi');
-  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
-  const nodes=[]; let n; while(n=walker.nextNode()) nodes.push(n);
-  let first=null;
-  nodes.forEach(node=>{
-    if(re.test(node.nodeValue)){
-      const span=document.createElement('span');
-      span.innerHTML=node.nodeValue.replace(re, m=>'<mark>'+m+'</mark>');
-      node.parentNode.replaceChild(span,node);
-      if(!first) first=span;
+function bindSearch(){
+  const box = document.getElementById('searchBox');
+  if(!box) return;
+  box.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      searchText(this.value.trim());
     }
   });
+}
+function searchText(q){
+  clearMarks();
+  if(!q) return;
+
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(escaped, 'gi');
+  const root = document.body;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node){
+      const parent = node.parentElement;
+      if(!parent) return NodeFilter.FILTER_REJECT;
+      if(['SCRIPT','STYLE','TEXTAREA','INPUT'].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+      if(!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+
+  const nodes = [];
+  let node;
+  while(node = walker.nextNode()) nodes.push(node);
+
+  let first = null;
+  nodes.forEach(textNode=>{
+    const value = textNode.nodeValue;
+    if(!re.test(value)) return;
+    re.lastIndex = 0;
+
+    const frag = document.createDocumentFragment();
+    let lastIndex = 0;
+    value.replace(re, (match, offset)=>{
+      frag.appendChild(document.createTextNode(value.slice(lastIndex, offset)));
+      const mark = document.createElement('mark');
+      mark.textContent = match;
+      frag.appendChild(mark);
+      if(!first) first = mark;
+      lastIndex = offset + match.length;
+      return match;
+    });
+    frag.appendChild(document.createTextNode(value.slice(lastIndex)));
+    textNode.parentNode.replaceChild(frag, textNode);
+  });
+
   if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
 }
 bindSearch();
 </script>
+
+    <hr class="section-divider">
+
+    <section id="vyos" class="doc-section">
+        <h1 class="big-title">VyOS — RTR zamiast Debiana</h1>
+        <div class="subnote">Ściąga awaryjna: gdy VM04/RTR jest systemem VyOS, nie robisz /etc/network/interfaces ani iptables. Używasz configure, set, commit, save.</div>
+
+        <div class="command-group">
+            <h2>Jak poznasz, co masz?</h2>
+            <div class="command-grid">
+                <div class="command-card">
+                    <p>Na RTR wpisz:</p>
+                    <pre>cat /etc/os-release</pre>
+                    <p>Jeśli zobaczysz <b>Debian GNU/Linux</b> — robisz konfigurację Debiana: <b>/etc/network/interfaces</b> + <b>iptables</b>.</p>
+                    <p>Jeśli zobaczysz <b>VyOS</b> — robisz konfigurację VyOS: <b>configure</b> + <b>set ...</b>.</p>
+                </div>
+                <div class="command-card">
+                    <p>Po zalogowaniu do VyOS sprawdź interfejsy:</p>
+                    <pre>show interfaces</pre>
+                    <p>albo:</p>
+                    <pre>ip a</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Gdy RTR jest czystym VyOS — najkrótsza ścieżka dla POD12</h2>
+            <div class="command-card">
+                <p>Wejście w tryb konfiguracji:</p>
+                <pre>configure</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Adresacja</h3>
+                <pre>set interfaces ethernet eth1 address '10.41.12.254/24'
+set interfaces ethernet eth2 address '192.168.76.12/24'
+set protocols static route 0.0.0.0/0 next-hop '192.168.76.1'
+set system name-server '8.8.8.8'</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>NAT / MASQUERADE</h3>
+                <pre>set nat source rule 10 outbound-interface name 'eth2'
+set nat source rule 10 source address '10.41.12.0/24'
+set nat source rule 10 translation address 'masquerade'</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>DNAT — SSH do VM01 i VM02</h3>
+                <pre>set nat destination rule 10 inbound-interface name 'eth2'
+set nat destination rule 10 protocol 'tcp'
+set nat destination rule 10 destination port '3301'
+set nat destination rule 10 translation address '10.41.12.201'
+set nat destination rule 10 translation port '22'
+
+set nat destination rule 20 inbound-interface name 'eth2'
+set nat destination rule 20 protocol 'tcp'
+set nat destination rule 20 destination port '1102'
+set nat destination rule 20 translation address '10.41.12.202'
+set nat destination rule 20 translation port '22'</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>DNAT — WWW do VM01 i VM02</h3>
+                <pre>set nat destination rule 30 inbound-interface name 'eth2'
+set nat destination rule 30 protocol 'tcp'
+set nat destination rule 30 destination port '5011'
+set nat destination rule 30 translation address '10.41.12.201'
+set nat destination rule 30 translation port '80'
+
+set nat destination rule 40 inbound-interface name 'eth2'
+set nat destination rule 40 protocol 'tcp'
+set nat destination rule 40 destination port '8762'
+set nat destination rule 40 translation address '10.41.12.202'
+set nat destination rule 40 translation port '80'</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Zapis</h3>
+                <pre>commit
+save
+exit</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Test</h3>
+                <pre>show interfaces
+show nat source rules
+show nat destination rules
+ping 8.8.8.8</pre>
+            </div>
+
+            <div class="vyos-warning">Najważniejsze: nie mieszaj. Debian RTR = iptables. VyOS RTR = set nat...</div>
+        </div>
+    </section>
 
     <hr class="section-divider">
 
