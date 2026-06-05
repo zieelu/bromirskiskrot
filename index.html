@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bromirski Skrót</title>
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    padding:24px;
+    background:#f2f2f2;
+    color:#111;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.wrapper{
+    max-width:1100px;
+    margin:0 auto;
+}
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:rgba(242,242,242,.94);
+    padding:14px 0 18px;
+    backdrop-filter:blur(6px);
+}
+.nav{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+.nav a{
+    display:inline-block;
+    padding:12px 18px;
+    border-radius:999px;
+    background:#111;
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+}
+.doc-section{
+    background:#fff;
+    border-radius:14px;
+    padding:34px 40px;
+    margin:20px 0 50px;
+    box-shadow:0 2px 18px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+.big-title{
+    text-align:center;
+    font-size:34px;
+    margin:10px 0 35px;
+    letter-spacing:.5px;
+}
+.section-divider{
+    margin:80px 0;
+    border:none;
+    height:8px;
+    background:linear-gradient(to right,#ff3b3b,#ffaa00,#00cc66,#0099ff);
+    border-radius:20px;
+}
+p{
+    font-size:18px;
+    line-height:1.45;
+    margin-top:0;
+}
+font[color="#47d459"], font[color="#ee0000"]{
+    font-weight:500;
+}
+.doc-image{
+    max-width:100%;
+    height:auto;
+    display:block;
+    margin:12px 0 24px;
+    border-radius:6px;
+}
+@media(max-width:700px){
+    body{padding:10px}
+    .doc-section{padding:18px}
+    .big-title{font-size:24px}
+    p{font-size:16px}
+}
+
+.site-title{text-align:center;margin:0 0 12px;font-size:28px;letter-spacing:.8px}
+.search{display:block;width:min(760px,100%);margin:0 auto 14px;padding:13px 16px;border:2px solid #111;border-radius:14px;font-size:17px;background:white;color:#111}
+.anchor-title{margin:42px 0 18px;padding:14px 18px;border-left:8px solid #111;background:#f3f3f3;border-radius:10px;font-size:26px}
+.subnote{margin:25px 0;padding:14px 18px;border-radius:10px;background:#fff7d6;border-left:8px solid #ffb300;font-weight:700}
+mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
+.backtop{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;text-decoration:none;padding:12px 15px;border-radius:999px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="topbar">
+        <h1 class="site-title">BROMIRSKI SKRÓT</h1>
+        <input id="searchBox" class="search" type="search" placeholder="Szukaj: DNAT, named-checkzone, nginx, haproxy... i ENTER">
+        <div class="nav">
+            <a href="#adresacja">Adresacja</a>
+            <a href="#nat">NAT + DNAT</a>
+            <a href="#ssh">SSH</a>
+            <a href="#apache-klasyczna">Apache klasyczna</a>
+            <a href="#apache-aliasy">Apache aliasy</a>
+            <a href="#haproxy">HAProxy</a>
+            <a href="#dns">DNS</a>
+            <a href="#dhcp">DHCP</a>
+            <a href="#nginx-klasyczna">Nginx klasyczna</a>
+            <a href="#nginx-aliasy">Nginx aliasy</a>
+        </div>
+    </div>
+    <section id="sekcja1" class="doc-section"><h1 class="big-title">SKRÓCONA INSTRUKCJA - WERSJA PIERWSZA</h1><h2 id="adresacja" class="anchor-title">Adresacja - RTR, VM01, VM02</h2><p style="line-height: 116%; margin-bottom: 0.11in">
+<img class="doc-image" height="193" src="img/obraz_01.png" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in">Skrócona
+instrukcja<br/>
+<b>1.</b> na rtr i vm01 i vm02 login na root i ip
+a<br/>
+<b>2.</b> Na RTR : nano /etc/network/interfaces<br/>
+dopisujemy
+to  na czerwono</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459">auto
+lo</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">iface
+lo inet loopback</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">allow-hotplug
+eth0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">auto
+eth0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">iface
+eth0 inet dhcp</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">auto
+eth1</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">iface
+eth1 inet static</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">address
+10.41.12.254</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">netmask
+255.255.255.0</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">auto
+eth2</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">iface
+eth2 inet static</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">address
+192.168.76.12</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">netmask
+255.255.255.0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">gateway
+192.168.76.1<br/>
+dns-nameservers 8.8.8.8<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>3.</b></span></font><font color="#000000"><span lang="en-US">
+zapisuje ctrl+s</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>4.</b></span></font><font color="#000000"><span lang="en-US">
+systemctl restart networking<br/>
+</span></font><br/>
+<br/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>5.</b></span></font><font color="#000000"><span lang="en-US">
+VM01  nano /etc/network/interfaces<br/>
+</span></font><font color="#84e290"><span lang="en-US">auto
+lo<br/>
+iface lo inet loopback<br/>
+<br/>
+allow-hotplug eth0<br/>
+auto
+eth0<br/>
+iface eth0 inet dhcp<br/>
+</span></font><font color="#000000"><span lang="en-US"><br/>
+</span></font><font color="#ee0000"><span lang="en-US">auto
+eth1<br/>
+iface eth1 inet static<br/>
+address 10.41.12.201<br/>
+netmask
+255.255.255.0<br/>
+gateway 10.41.12.254<br/>
+dns-nameservers 8.8.8.8</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><span lang="en-US"><b>6.</b></span><span lang="en-US">
+zapis<br/>
+</span><span lang="en-US"><b>7.</b></span><span lang="en-US">
+Systemctl restart networking<br/>
+</span><span lang="en-US"><b>8.</b></span><span lang="en-US">
+VM02  nano /etc/netplan/50-cloud-init.yaml<br/>
+network:<br/>
+</span><font color="#47d459"><span lang="en-US">version:
+2<br/>
+ethernets:<br/>
+</span></font><font color="#ee0000"><span lang="en-US">eth1:</span></font><span lang="en-US"><br/>
+</span><font color="#84e290"><span lang="en-US">dhcp4:
+no</span></font><span lang="en-US"><br/>
+</span><font color="#ee0000"><span lang="en-US">addresses:<br/>
+-
+10.41.12.202/24<br/>
+optional: true<br/>
+routes:<br/>
+- to:
+default<br/>
+via: 10.41.12.254<br/>
+nameservers:<br/>
+    
+addresses:<br/>
+          - 8.8.8.8</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img class="doc-image" height="318" src="img/obraz_02.png" width="605"/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US"><br/>
+</span></font><font color="#000000"><span lang="en-US"><b>9.</b></span></font><font color="#000000"><span lang="en-US">
+Netplan apply<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
+<h2 id="nat" class="anchor-title">NAT + DNAT</h2>
+RTR  wprowadzamy <br/>
+echo 1 &gt;
+/proc/sys/net/ipv4/ip_forward<br/>
+iptables -t nat -F<br/>
+iptables
+-F<br/>
+iptables -t nat -A POSTROUTING -s 10.41.12.0/24 -o eth2 -j
+MASQUERADE<br/>
+iptables -A FORWARD -i eth1 -o eth2 -j
+ACCEPT<br/>
+iptables -A FORWARD -i eth2 -o eth1 -m state --state
+ESTABLISHED,RELATED -j ACCEPT<br/>
+ -- sprawdź pingi vm01<br/>
+ustawiamy
+DNat<br/>
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 3301
+-j DNAT --to 10.41.12.201:22<br/>
+iptables -t nat -A PREROUTING -i
+eth2 -p tcp --dport 1102 -j DNAT --to 10.41.12.202:22<br/>
+iptables
+-t nat -A PREROUTING -i eth2 -p tcp --dport 5011 -j DNAT --to
+10.41.12.201:80<br/>
+iptables -t nat -A PREROUTING -i eth2 -p tcp
+--dport 8762 -j DNAT --to 10.41.12.202:80<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>11</b></span></font><font color="#000000"><span lang="en-US">
+<h2 id="ssh" class="anchor-title">SSH</h2>
+DZIAŁANIE SSH – ustawiamy na vm01 I vm02 logowanie<br/>
+vm01<br/>
+nano
+/etc/ssh/sshd_config<br/>
+dopisz:<br/>
+PermitRootLogin
+yes<br/>
+PasswordAuthentication yes<br/>
+zapisz<br/>
+systemctl
+restart ssh<br/>
+<br/>
+na vm02 identycznie || tlytko na vm01 logujemy
+sie ssh od razu root a na vm02 student<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>12.
+<h2 id="apache-klasyczna" class="anchor-title">Apache - wersja klasyczna</h2>
+Konfiguraraja I instalajcja apache <br/>
+</b></span></font><font color="#000000"><span lang="en-US">-VM01<br/>
+apt
+update<br/>
+apt install apache2 -y<br/>
+apt install curl -y<br/>
+systemctl
+enable apache2<br/>
+systemctl restart apache2<br/>
+echo "VM01"
+&gt; /var/www/html/index.html<br/>
+</span></font><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">-Teraz
+utwórz strony dla domen:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">mkdir
+-p /var/www/12.net<br/>
+mkdir -p
+/var/www/122921.student.san.edu.pl<br/>
+<br/>
+echo "VM01 -
+12.net" &gt; /var/www/12.net/index.html<br/>
+echo "VM01 -
+122921.student.san.edu.pl" &gt;
+/var/www/122921.student.san.edu.pl/index.html</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><br/>
+-VirtualHosty
+VM01(wklej cale) : </span></font>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/apache2/sites-available/12.net.conf &lt;&lt;'EOF'<br/>
+&lt;VirtualHost
+*:80&gt;<br/>
+    ServerName 12.net<br/>
+    DocumentRoot
+/var/www/12.net<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF<br/>
+<br/>
+cat &gt;
+/etc/apache2/sites-available/122921.student.san.edu.pl.conf
+&lt;&lt;'EOF'<br/>
+&lt;VirtualHost *:80&gt;<br/>
+    ServerName
+122921.student.san.edu.pl<br/>
+    DocumentRoot
+/var/www/122921.student.san.edu.pl<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><br/>
+-Włącz
+strony:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">a2ensite
+12.net.conf<br/>
+a2ensite 122921.student.san.edu.pl.conf<br/>
+systemctl
+reload apache2</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Test
+lokalny na VM01:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">curl
+http://localhost<br/>
+curl -H "Host: 12.net"
+http://localhost<br/>
+curl -H "Host: 122921.student.san.edu.pl"
+</span></font><font color="#467886"><u><a href="http://localhost/"><span lang="en-US">http://localhost</span></a></u></font><font color="#000000"><span lang="en-US"><br/>
+<br/>
+**VM02</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install apache2 -y<br/>
+apt install curl -y<br/>
+systemctl
+enable apache2<br/>
+systemctl restart apache2<br/>
+</span></font><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">-Strona
+główna VM02</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">echo
+"VM02" &gt; /var/www/html/index.html<br/>
+<br/>
+-Katalogi
+domen</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">mkdir
+-p /var/www/12.lodz<br/>
+mkdir -p /var/www/12.net.pl<br/>
+<br/>
+echo
+"VM02 - 12.lodz" &gt; /var/www/12.lodz/index.html<br/>
+echo
+"VM02 - 12.net.pl" &gt; /var/www/12.net.pl/index.html</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-
+VirtualHosty (wklej ccale)</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/apache2/sites-available/12.lodz.conf &lt;&lt;'EOF'<br/>
+&lt;VirtualHost
+*:80&gt;<br/>
+    ServerName 12.lodz<br/>
+    DocumentRoot
+/var/www/12.lodz<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF<br/>
+<br/>
+cat &gt;
+/etc/apache2/sites-available/12.net.pl.conf &lt;&lt;'EOF'<br/>
+&lt;VirtualHost
+*:80&gt;<br/>
+    ServerName 12.net.pl<br/>
+    DocumentRoot
+/var/www/12.net.pl<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-Włączenie
+stron</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">a2ensite
+12.lodz.conf<br/>
+a2ensite 12.net.pl.conf<br/>
+<br/>
+systemctl reload
+apache2</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><br/>
+-Testy
+na VM02</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">curl
+http://localhost</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">powinno
+zwrócić:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">VM02</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">curl
+-H "Host: 12.lodz" http://localhost</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">powinno
+zwrócić:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">VM02
+- 12.lodz</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">curl
+-H "Host: 12.net.pl" </span></font><font color="#467886"><u><a href="http://localhost/"><span lang="en-US">http://localhost</span></a></u></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><br/>
+</span></font><font color="#000000"><span lang="en-US"><b>13.
+<h2 id="haproxy" class="anchor-title">HAProxy</h2>
+HAPROXY RTR</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install haproxy -y<br/>
+cp /etc/haproxy/haproxy.cfg
+/etc/haproxy/haproxy.cfg.bak<br/>
+<br/>
+-Wklej całą konfigurację
+(ew zmień adresację na dole pliku)</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/haproxy/haproxy.cfg &lt;&lt;'EOF'</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">global</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log /dev/log local0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log /dev/log local1 notice</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">daemon</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">defaults</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log global</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">mode http</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">option httplog</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">option dontlognull</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout connect 5000</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout client 50000</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout server 50000</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">frontend
+http_front</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">bind *:98</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">default_backend web_servers</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">backend
+web_servers</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">balance roundrobin</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">server vm01 10.41.12.201:80 check</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">server vm02 10.41.12.202:80 check</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">EOF</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>Sprawdź
+konfigurację</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">haproxy
+-c -f /etc/haproxy/haproxy.cfg</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Ma
+być:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Configuration
+file is valid</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+enable haproxy<br/>
+systemctl restart haproxy<br/>
+systemctl status
+haproxy</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">test<br/>
+curl
+http://localhost:98<br/>
+curl http://localhost:98<br/>
+curl
+http://localhost:98<br/>
+curl http://localhost:98</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>14.
+<h2 id="dns" class="anchor-title">DNS</h2>
+DNS krok po kroku na RTR:<br/>
+</b></span></font><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install bind9 bind9-utils -y<br/>
+systemctl status
+bind9|<br/>
+<br/>
+nano /etc/bind/named.conf.local</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-Na
+końcu dopisz:<br/>
+zone "12.net" {<br/>
+type master;<br/>
+file
+"/etc/bind/db.12.net";<br/>
+};<br/>
+<br/>
+zone "12.lodz"
+{<br/>
+type master;<br/>
+file "/etc/bind/db.12.lodz";<br/>
+};<br/>
+<br/>
+zone
+"122921.student.san.edu.pl" {<br/>
+type master;<br/>
+file
+"/etc/bind/db.122921.student.san.edu.pl";<br/>
+};<br/>
+<br/>
+zone
+"12.net.pl" {<br/>
+type master;<br/>
+file
+"/etc/bind/db.12.net.pl";<br/>
+};<br/>
+</span></font><img class="doc-image" height="324" src="img/obraz_03.png" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>-Utwórz
+pliki stref</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.net</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.net &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN SOA
+ns.12.net. root.12.net. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.net.<br/>
+ns IN A 10.41.12.254<br/>
+@ IN A
+10.41.12.201<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape1" class="doc-image" height="2" src="img/obraz_04.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.lodz</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.lodz &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN
+SOA ns.12.lodz. root.12.lodz. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.lodz.<br/>
+ns IN A 10.41.12.254<br/>
+@ IN
+A 10.41.12.202<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape2" class="doc-image" height="2" src="img/obraz_05.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>122921.student.san.edu.pl</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.122921.student.san.edu.pl &lt;&lt;'EOF'<br/>
+$TTL
+604800<br/>
+@ IN SOA ns.122921.student.san.edu.pl.
+root.122921.student.san.edu.pl. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.122921.student.san.edu.pl.<br/>
+ns IN A
+10.41.12.254<br/>
+@ IN A 10.41.12.201<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape3" class="doc-image" height="2" src="img/obraz_06.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.net.pl</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.net.pl &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN
+SOA ns.12.net.pl. root.12.net.pl. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.net.pl.<br/>
+ns IN A 10.41.12.254<br/>
+@
+IN A 10.41.12.202<br/>
+EOF</b></span></font></p>
+<p lang="en-US" style="margin-bottom: 0.11in; line-height: 116%"><br/>
+<br/>
+</p>
+<p lang="en-US" style="margin-bottom: 0.11in; line-height: 116%"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Forwardery
+do Internetu</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Otwórz:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">nano
+/etc/bind/named.conf.options<br/>
+Znajdź:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">forwarders
+{<br/>
+};</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">i
+zamień na  I odkomentuj:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">forwarders
+{<br/>
+    8.8.8.8;<br/>
+    1.1.1.1;<br/>
+};</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">sprawdzenie:<br/>
+named-checkconf<br/>
+powinno
+zwrócić pusty wieersz<br/>
+<br/>
+Teraz sprawdź strefy:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">named-checkzone
+12.net /etc/bind/db.12.net<br/>
+named-checkzone 12.lodz
+/etc/bind/db.12.lodz<br/>
+named-checkzone 122921.student.san.edu.pl
+/etc/bind/db.122921.student.san.edu.pl<br/>
+named-checkzone 12.net.pl
+/etc/bind/db.12.net.pl</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">Jak
+wszędzie będzie OK, restart:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+restart bind9<br/>
+systemctl status bind9</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">Potem
+test DNS na RTR:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">nslookup
+12.net 127.0.0.1<br/>
+nslookup 12.lodz 127.0.0.1<br/>
+nslookup
+google.com 127.0.0.1</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><br/>
+teraz
+zmieniamy konfiguracjee na vmkach z dns-nameservers z 8.8.8.8 na
+10.41.12.254<br/>
+<br/>
+i testy<br/>
+nslookup 12.net<br/>
+nslookup
+12.lodz<br/>
+nslookup
+google.com<br/>
+<br/>
+<br/>
+--------------------------------------------------<br/>
+</font><font color="#000000"><h2 id="dhcp" class="anchor-title">DHCP / VM03</h2>
+<b>vmo3
+dhcp</b></font><font color="#000000"><br/>
+na RTR<br/>
+apt install
+isc-dhcp-server -y</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">nano
+/etc/dhcp/dhcpd.conf -tego nie trzeba<br/>
+wpisz w konsole:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/dhcp/dhcpd.conf &lt;&lt;'EOF'<br/>
+default-lease-time
+600;<br/>
+max-lease-time 7200;<br/>
+authoritative;<br/>
+<br/>
+subnet
+10.41.12.0 netmask 255.255.255.0 {<br/>
+range 10.41.12.100
+10.41.12.150;<br/>
+option routers 10.41.12.254;<br/>
+option
+domain-name-servers 10.41.12.254;<br/>
+}<br/>
+EOF</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">nastepniee:
+nano /etc/default/isc-dhcp-server<br/>
+zmień:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">INTERFACESv4=""</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">na:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">INTERFACESv4="eth1"</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">zapisz
+i wykonaj:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+restart isc-dhcp-server<br/>
+systemctl status isc-dhcp-server</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">I
+w sumie powinno działacc zaloguj się na vm03 i zobacz </font>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">ip
+a<br/>
+nmcli con show<br/>
+powinien bycc przydzielony adres z
+dhcp<br/>
+-------------------------------------------------</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">—
+</font><h2 id="nginx-klasyczna" class="anchor-title">Nginx - wersja klasyczna</h2>
+<font color="#000000"><b>zadanie 2 na Nginx</b></font><font color="#000000">
+wyglądałoby prawie tak samo, tylko zamiast Apache VirtualHostów
+robisz </font><font color="#000000"><b>server blocki</b></font><font color="#000000">.</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>VM01</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install nginx -y<br/>
+systemctl enable
+nginx<br/>
+systemctl restart nginx</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">echo
+"VM01" &gt; /var/www/html/index.html<br/>
+<br/>
+mkdir -p
+/var/www/12.net<br/>
+mkdir -p
+/var/www/122921.student.san.edu.pl<br/>
+<br/>
+echo "VM01 -
+12.net" &gt; /var/www/12.net/index.html<br/>
+echo "VM01 -
+122921.student.san.edu.pl" &gt;
+/var/www/122921.student.san.edu.pl/index.html</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/nginx/sites-available/12.net &lt;&lt;'EOF'<br/>
+server {<br/>
+
+   listen 80;<br/>
+    server_name 12.net;<br/>
+    root
+/var/www/12.net;<br/>
+    index index.html;<br/>
+}<br/>
+EOF<br/>
+<br/>
+cat
+&gt; /etc/nginx/sites-available/122921.student.san.edu.pl
+&lt;&lt;'EOF'<br/>
+server {<br/>
+    listen 80;<br/>
+    server_name
+122921.student.san.edu.pl;<br/>
+    root
+/var/www/122921.student.san.edu.pl;<br/>
+    index index.html;<br/>
+}<br/>
+EOF</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">ln
+-s /etc/nginx/sites-available/12.net /etc/nginx/sites-enabled/<br/>
+ln
+-s /etc/nginx/sites-available/122921.student.san.edu.pl
+/etc/nginx/sites-enabled/<br/>
+<br/>
+nginx -t<br/>
+systemctl reload
+nginx</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Test:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">curl
+http://localhost<br/>
+curl -H "Host: 12.net"
+http://localhost<br/>
+curl -H "Host: 122921.student.san.edu.pl"
+http://localhost</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape4" class="doc-image" height="2" src="img/obraz_07.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>VM02</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install nginx -y<br/>
+systemctl enable
+nginx<br/>
+systemctl restart nginx</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">echo
+"VM02" &gt; /var/www/html/index.html<br/>
+<br/>
+mkdir -p
+/var/www/12.lodz<br/>
+mkdir -p /var/www/12.net.pl<br/>
+<br/>
+echo
+"VM02 - 12.lodz" &gt; /var/www/12.lodz/index.html<br/>
+echo
+"VM02 - 12.net.pl" &gt; /var/www/12.net.pl/index.html</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/nginx/sites-available/12.lodz &lt;&lt;'EOF'<br/>
+server {<br/>
+
+   listen 80;<br/>
+    server_name 12.lodz;<br/>
+    root
+/var/www/12.lodz;<br/>
+    index index.html;<br/>
+}<br/>
+EOF<br/>
+<br/>
+cat
+&gt; /etc/nginx/sites-available/12.net.pl &lt;&lt;'EOF'<br/>
+server
+{<br/>
+    listen 80;<br/>
+    server_name 12.net.pl;<br/>
+    root
+/var/www/12.net.pl;<br/>
+    index index.html;<br/>
+}<br/>
+EOF</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">ln
+-s /etc/nginx/sites-available/12.lodz /etc/nginx/sites-enabled/<br/>
+ln
+-s /etc/nginx/sites-available/12.net.pl
+/etc/nginx/sites-enabled/<br/>
+<br/>
+nginx -t<br/>
+systemctl reload
+nginx</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Test:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">curl
+http://localhost<br/>
+curl -H "Host: 12.lodz"
+http://localhost<br/>
+curl -H "Host: 12.net.pl"
+http://localhost</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Różnica
+główna:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Apache:
+/etc/apache2/sites-available + a2ensite<br/>
+Nginx: 
+/etc/nginx/sites-available + ln -s do sites-enabled</span></font></p>
+</section>
+    <hr class="section-divider">
+    <section id="sekcja2" class="doc-section"><h1 class="big-title">SKRÓCONA INSTRUKCJA - ALIASY POPRAWIONE</h1><div class="subnote">Pełna druga wersja dokumentu - poprawione aliasy Apache/Nginx.</div><p style="line-height: 116%; margin-bottom: 0.11in">
+<img class="doc-image" height="193" src="img/obraz_08.png" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in">Skrócona
+instrukcja<br/>
+<b>1.</b> na rtr i vm01 i vm02 login na root i ip
+a<br/>
+<b>2.</b> Na RTR : nano /etc/network/interfaces<br/>
+dopisujemy
+to  na czerwono</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459">auto
+lo</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">iface
+lo inet loopback</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">allow-hotplug
+eth0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">auto
+eth0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#47d459"><span lang="en-US">iface
+eth0 inet dhcp</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">auto
+eth1</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">iface
+eth1 inet static</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">address
+10.41.12.254</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">netmask
+255.255.255.0</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">auto
+eth2</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">iface
+eth2 inet static</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">address
+192.168.76.12</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">netmask
+255.255.255.0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US">gateway
+192.168.76.1<br/>
+dns-nameservers 8.8.8.8<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>3.</b></span></font><font color="#000000"><span lang="en-US">
+zapisuje ctrl+s</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>4.</b></span></font><font color="#000000"><span lang="en-US">
+systemctl restart networking<br/>
+</span></font><br/>
+<br/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>5.</b></span></font><font color="#000000"><span lang="en-US">
+VM01  nano /etc/network/interfaces<br/>
+</span></font><font color="#84e290"><span lang="en-US">auto
+lo<br/>
+iface lo inet loopback<br/>
+<br/>
+allow-hotplug eth0<br/>
+auto
+eth0<br/>
+iface eth0 inet dhcp<br/>
+</span></font><font color="#000000"><span lang="en-US"><br/>
+</span></font><font color="#ee0000"><span lang="en-US">auto
+eth1<br/>
+iface eth1 inet static<br/>
+address 10.41.12.201<br/>
+netmask
+255.255.255.0<br/>
+gateway 10.41.12.254<br/>
+dns-nameservers 8.8.8.8</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><span lang="en-US"><b>6.</b></span><span lang="en-US">
+zapis<br/>
+</span><span lang="en-US"><b>7.</b></span><span lang="en-US">
+Systemctl restart networking<br/>
+</span><span lang="en-US"><b>8.</b></span><span lang="en-US">
+VM02  nano /etc/netplan/50-cloud-init.yaml<br/>
+network:<br/>
+</span><font color="#47d459"><span lang="en-US">version:
+2<br/>
+ethernets:<br/>
+</span></font><font color="#ee0000"><span lang="en-US">eth1:</span></font><span lang="en-US"><br/>
+</span><font color="#84e290"><span lang="en-US">dhcp4:
+no</span></font><span lang="en-US"><br/>
+</span><font color="#ee0000"><span lang="en-US">addresses:<br/>
+-
+10.41.12.202/24<br/>
+optional: true<br/>
+routes:<br/>
+- to:
+default<br/>
+via: 10.41.12.254<br/>
+nameservers:<br/>
+    
+addresses:<br/>
+          - 8.8.8.8</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img class="doc-image" height="318" src="img/obraz_09.png" width="605"/>
+</p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US"><br/>
+</span></font><font color="#000000"><span lang="en-US"><b>9.</b></span></font><font color="#000000"><span lang="en-US">
+Netplan apply<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
+RTR  wprowadzamy <br/>
+echo 1 &gt;
+/proc/sys/net/ipv4/ip_forward<br/>
+iptables -t nat -F<br/>
+iptables
+-F<br/>
+iptables -t nat -A POSTROUTING -s 10.41.12.0/24 -o eth2 -j
+MASQUERADE<br/>
+iptables -A FORWARD -i eth1 -o eth2 -j
+ACCEPT<br/>
+iptables -A FORWARD -i eth2 -o eth1 -m state --state
+ESTABLISHED,RELATED -j ACCEPT<br/>
+ -- sprawdź pingi vm01<br/>
+ustawiamy
+DNat<br/>
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 3301
+-j DNAT --to 10.41.12.201:22<br/>
+iptables -t nat -A PREROUTING -i
+eth2 -p tcp --dport 1102 -j DNAT --to 10.41.12.202:22<br/>
+iptables
+-t nat -A PREROUTING -i eth2 -p tcp --dport 5011 -j DNAT --to
+10.41.12.201:80<br/>
+iptables -t nat -A PREROUTING -i eth2 -p tcp
+--dport 8762 -j DNAT --to 10.41.12.202:80<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>11</b></span></font><font color="#000000"><span lang="en-US">
+DZIAŁANIE SSH – ustawiamy na vm01 I vm02 logowanie<br/>
+vm01<br/>
+nano
+/etc/ssh/sshd_config<br/>
+dopisz:<br/>
+PermitRootLogin
+yes<br/>
+PasswordAuthentication yes<br/>
+zapisz<br/>
+systemctl
+restart ssh<br/>
+<br/>
+na vm02 identycznie || tlytko na vm01 logujemy
+sie ssh od razu root a na vm02 student<br/>
+<br/>
+</span></font><font color="#000000"><span lang="en-US"><b>12.
+<h2 id="apache-aliasy" class="anchor-title">Apache - wersja aliasowa</h2>
+Konfiguraraja I instalajcja apache <br/>
+</b></span></font><font color="#000000"><span lang="en-US">-VM01<br/>
+apt
+update<br/>
+apt install apache2 -y<br/>
+apt install curl -y<br/>
+systemctl
+enable apache2<br/>
+systemctl restart apache2<br/>
+echo "VM01"
+&gt; /var/www/html/index.html<br/>
+</span></font><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">-Teraz
+utwórz strony dla domen:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">mkdir
+-p /var/www/12.net<br/>
+<br/>
+echo "VM01 - 12.net" &gt;
+/var/www/12.net/index.html<br/>
+<br/>
+-VirtualHosty VM01(wklej cale)
+: </span></font>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">cat
+&gt; /etc/apache2/sites-available/12.net.conf &lt;&lt;'EOF'<br/>
+&lt;VirtualHost
+*:80&gt;<br/>
+ServerName 12.net<br/>
+ServerAlias
+122921.student.san.edu.pl<br/>
+DocumentRoot
+/var/www/12.net<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><br/>
+-Włącz
+strony:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">a2ensite
+12.net.conf<br/>
+systemctl reload apache2</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Test
+lokalny na VM01:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">curl
+http://localhost<br/>
+curl -H "Host: 12.net"
+http://localhost<br/>
+curl -H "Host: 122921.student.san.edu.pl"
+http://localhost</font><font color="#000000"><span lang="en-US"><br/>
+<br/>
+**VM02</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install apache2 -y<br/>
+apt install curl -y<br/>
+systemctl
+enable apache2<br/>
+systemctl restart apache2<br/>
+</span></font><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">-Strona
+główna VM02</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">echo
+"VM02" &gt; /var/www/html/index.html<br/>
+<br/>
+-Katalogi
+domen</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">mkdir
+-p /var/www/12.lodz<br/>
+<br/>
+echo "VM02 - 12.lodz" &gt;
+/var/www/12.lodz/index.html<br/>
+</span></font><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-
+VirtualHosty (wklej ccale)</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">cat
+&gt; /etc/apache2/sites-available/12.lodz.conf &lt;&lt;'EOF'<br/>
+&lt;VirtualHost
+*:80&gt;<br/>
+ServerName 12.lodz<br/>
+ServerAlias
+12.net.pl<br/>
+DocumentRoot /var/www/12.lodz<br/>
+&lt;/VirtualHost&gt;<br/>
+EOF</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-Włączenie
+stron</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">a2ensite
+12.lodz.conf<br/>
+<br/>
+systemctl reload apache2</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><br/>
+-Testy
+na VM02</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">curl
+http://localhost<br/>
+curl -H "Host: 12.lodz"
+http://localhost<br/>
+curl -H "Host: 12.net.pl"
+</font><font color="#467886"><u><a href="http://localhost/">http://localhost</a></u></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><br/>
+</span></font><font color="#000000"><span lang="en-US"><b>13.
+HAPROXY RTR</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install haproxy -y<br/>
+cp /etc/haproxy/haproxy.cfg
+/etc/haproxy/haproxy.cfg.bak<br/>
+<br/>
+-Wklej całą konfigurację
+(ew zmień adresację na dole pliku)</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/haproxy/haproxy.cfg &lt;&lt;'EOF'</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">global</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log /dev/log local0</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log /dev/log local1 notice</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">daemon</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">defaults</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">log global</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">mode http</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">option httplog</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">option dontlognull</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout connect 5000</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout client 50000</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">timeout server 50000</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">frontend
+http_front</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">bind *:98</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">default_backend web_servers</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">backend
+web_servers</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">balance roundrobin</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">server vm01 10.41.12.201:80 check</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">
+<span lang="en-US">server vm02 10.41.12.202:80 check</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">EOF</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>Sprawdź
+konfigurację</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">haproxy
+-c -f /etc/haproxy/haproxy.cfg</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Ma
+być:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Configuration
+file is valid</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+enable haproxy<br/>
+systemctl restart haproxy<br/>
+systemctl status
+haproxy</span></font></p>
+<p lang="en-US" style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">test<br/>
+curl
+http://localhost:98<br/>
+curl http://localhost:98<br/>
+curl
+http://localhost:98<br/>
+curl http://localhost:98</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>14.
+DNS krok po kroku na RTR:<br/>
+</b></span></font><font color="#000000"><span lang="en-US">apt
+update<br/>
+apt install bind9 bind9-utils -y<br/>
+systemctl status
+bind9<br/>
+<br/>
+nano /etc/bind/named.conf.local</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">-Na
+końcu dopisz:<br/>
+zone "12.net" {<br/>
+type master;<br/>
+file
+"/etc/bind/db.12.net";<br/>
+};<br/>
+<br/>
+zone "12.lodz"
+{<br/>
+    type master;<br/>
+    file
+"/etc/bind/db.12.lodz";<br/>
+};<br/>
+<br/>
+zone
+"122921.student.san.edu.pl" {<br/>
+    type master;<br/>
+  
+ file "/etc/bind/db.122921.student.san.edu.pl";<br/>
+};<br/>
+<br/>
+zone
+"12.net.pl" {<br/>
+    type master;<br/>
+    file
+"/etc/bind/db.12.net.pl";<br/>
+};<br/>
+</span></font><img class="doc-image" height="324" src="img/obraz_10.png" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>-Utwórz
+pliki stref</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.net</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.net &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN SOA
+ns.12.net. root.12.net. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.net.<br/>
+ns IN A 10.41.12.254<br/>
+@ IN A
+10.41.12.201<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape1" class="doc-image" height="2" src="img/obraz_11.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.lodz</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.lodz &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN
+SOA ns.12.lodz. root.12.lodz. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.lodz.<br/>
+ns IN A 10.41.12.254<br/>
+@ IN
+A 10.41.12.202<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape2" class="doc-image" height="2" src="img/obraz_12.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>122921.student.san.edu.pl</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.122921.student.san.edu.pl &lt;&lt;'EOF'<br/>
+$TTL
+604800<br/>
+@ IN SOA ns.122921.student.san.edu.pl.
+root.122921.student.san.edu.pl. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.122921.student.san.edu.pl.<br/>
+ns IN A
+10.41.12.254<br/>
+@ IN A 10.41.12.201<br/>
+EOF</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><img alt="Shape3" class="doc-image" height="2" src="img/obraz_13.gif" width="605"/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>12.net.pl</b></span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>cat
+&gt; /etc/bind/db.12.net.pl &lt;&lt;'EOF'<br/>
+$TTL 604800<br/>
+@ IN
+SOA ns.12.net.pl. root.12.net.pl. (<br/>
+2<br/>
+604800<br/>
+86400<br/>
+2419200<br/>
+604800
+)<br/>
+<br/>
+@ IN NS ns.12.net.pl.<br/>
+ns IN A 10.41.12.254<br/>
+@
+IN A 10.41.12.202<br/>
+EOF</b></span></font></p>
+<p lang="en-US" style="margin-bottom: 0.11in; line-height: 116%"><br/>
+<br/>
+</p>
+<p lang="en-US" style="margin-bottom: 0.11in; line-height: 116%"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Forwardery
+do Internetu</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Otwórz:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">nano
+/etc/bind/named.conf.options<br/>
+Znajdź:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">forwarders
+{<br/>
+};</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">i
+zamień na  I odkomentuj:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">forwarders
+{<br/>
+    8.8.8.8;<br/>
+    1.1.1.1;<br/>
+};</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">sprawdzenie:<br/>
+named-checkconf<br/>
+powinno
+zwrócić pusty wieersz<br/>
+<br/>
+Teraz sprawdź strefy:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">named-checkzone
+12.net /etc/bind/db.12.net<br/>
+named-checkzone 12.lodz
+/etc/bind/db.12.lodz<br/>
+named-checkzone 122921.student.san.edu.pl
+/etc/bind/db.122921.student.san.edu.pl<br/>
+named-checkzone 12.net.pl
+/etc/bind/db.12.net.pl</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">Jak
+wszędzie będzie OK, restart:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+restart bind9<br/>
+systemctl status bind9</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">Potem
+test DNS na RTR:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">nslookup
+12.net 127.0.0.1<br/>
+nslookup 12.lodz 127.0.0.1<br/>
+nslookup
+google.com 127.0.0.1</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><br/>
+teraz
+zmieniamy konfiguracjee na vmkach z dns-nameservers z 8.8.8.8 na
+10.41.12.254<br/>
+<br/>
+i testy<br/>
+nslookup 12.net<br/>
+nslookup
+12.lodz<br/>
+nslookup
+google.com<br/>
+<br/>
+<br/>
+--------------------------------------------------<br/>
+</font><font color="#000000"><b>vmo3
+dhcp</b></font><font color="#000000"><br/>
+na RTR<br/>
+apt install
+isc-dhcp-server -y</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">nano
+/etc/dhcp/dhcpd.conf -tego nie trzeba<br/>
+wpisz w konsole:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">cat
+&gt; /etc/dhcp/dhcpd.conf &lt;&lt;'EOF'<br/>
+default-lease-time
+600;<br/>
+max-lease-time 7200;<br/>
+authoritative;<br/>
+<br/>
+subnet
+10.41.12.0 netmask 255.255.255.0 {<br/>
+range 10.41.12.100
+10.41.12.150;<br/>
+option routers 10.41.12.254;<br/>
+option
+domain-name-servers 10.41.12.254;<br/>
+}<br/>
+EOF</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">nastepniee:
+nano /etc/default/isc-dhcp-server<br/>
+zmień:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">INTERFACESv4=""</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">na:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">INTERFACESv4="eth1"</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">zapisz
+i wykonaj:</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">systemctl
+restart isc-dhcp-server<br/>
+systemctl status isc-dhcp-server</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">I
+w sumie powinno działacc zaloguj się na vm03 i zobacz </font>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">ip
+a<br/>
+nmcli con show<br/>
+powinien bycc przydzielony adres z
+dhcp<br/>
+-------------------------------------------------</font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">—
+<h2 id="nginx-aliasy" class="anchor-title">Nginx - wersja aliasowa</h2>
+zadanie 2 na Nginx wyglądałoby prawie tak samo, tylko zamiast
+Apache VirtualHostów robisz server blocki.<br/>
+<br/>
+VM01<br/>
+<br/>
+apt
+update<br/>
+apt install nginx -y<br/>
+systemctl enable
+nginx<br/>
+systemctl restart nginx<br/>
+<br/>
+echo "VM01" &gt;
+/var/www/html/index.html<br/>
+<br/>
+mkdir -p /var/www/12.net<br/>
+<br/>
+echo
+"VM01 - 12.net" &gt; /var/www/12.net/index.html<br/>
+<br/>
+cat
+&gt; /etc/nginx/sites-available/12.net &lt;&lt;'EOF'<br/>
+server
+{<br/>
+listen 80;<br/>
+server_name 12.net
+122921.student.san.edu.pl;<br/>
+root /var/www/12.net;<br/>
+index
+index.html;<br/>
+}<br/>
+EOF<br/>
+<br/>
+ln -s
+/etc/nginx/sites-available/12.net /etc/nginx/sites-enabled/<br/>
+<br/>
+nginx
+-t<br/>
+systemctl reload nginx<br/>
+<br/>
+Test:<br/>
+curl
+http://localhost<br/>
+curl -H "Host: 12.net"
+http://localhost<br/>
+curl -H "Host: 122921.student.san.edu.pl"
+</font><font color="#467886"><u><a href="http://localhost/">http://localhost</a></u></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><br/>
+<br/>
+</p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><b>VM02<br/>
+<br/>
+apt
+update<br/>
+apt install nginx -y<br/>
+systemctl enable
+nginx<br/>
+systemctl restart nginx<br/>
+<br/>
+echo "VM02" &gt;
+/var/www/html/index.html<br/>
+<br/>
+mkdir -p /var/www/12.lodz<br/>
+<br/>
+echo
+"VM02 - 12.lodz" &gt; /var/www/12.lodz/index.html<br/>
+<br/>
+cat
+&gt; /etc/nginx/sites-available/12.lodz &lt;&lt;'EOF'<br/>
+server
+{<br/>
+listen 80;<br/>
+server_name 12.lodz 12.net.pl;<br/>
+root
+/var/www/12.lodz;<br/>
+index index.html;<br/>
+}<br/>
+EOF<br/>
+<br/>
+ln
+-s /etc/nginx/sites-available/12.lodz
+/etc/nginx/sites-enabled/<br/>
+<br/>
+nginx -t<br/>
+systemctl reload
+nginx<br/>
+<br/>
+Test:<br/>
+curl http://localhost<br/>
+curl -H "Host:
+12.lodz" http://localhost<br/>
+curl -H "Host: 12.net.pl"
+http://localhost</b></font><font color="#000000"><span lang="en-US">Różnica
+główna:</span></font></p>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US">Apache:
+/etc/apache2/sites-available + a2ensite<br/>
+Nginx: 
+/etc/nginx/sites-available + ln -s do sites-enabled</span></font></p>
+</section>
+</div>
+
+<a href="#" class="backtop">↑ góra</a>
+<script>
+const originalWrapper = document.querySelector('.wrapper').innerHTML;
+function bindSearch(){
+  const box=document.getElementById('searchBox');
+  if(!box) return;
+  box.addEventListener('keydown', function(e){ if(e.key==='Enter') searchText(this.value.trim()); });
+}
+function searchText(q){
+  if(!q) return;
+  document.querySelector('.wrapper').innerHTML = originalWrapper;
+  bindSearch();
+  const root=document.querySelector('.wrapper');
+  const esc=q.replace(/[.*+?^${}()|[\]\]/g,'\$&');
+  const re=new RegExp(esc,'gi');
+  const walker=document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes=[]; let n; while(n=walker.nextNode()) nodes.push(n);
+  let first=null;
+  nodes.forEach(node=>{
+    if(re.test(node.nodeValue)){
+      const span=document.createElement('span');
+      span.innerHTML=node.nodeValue.replace(re, m=>'<mark>'+m+'</mark>');
+      node.parentNode.replaceChild(span,node);
+      if(!first) first=span;
+    }
+  });
+  if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+}
+bindSearch();
+</script>
+</body>
+</html>
