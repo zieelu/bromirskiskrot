@@ -282,7 +282,38 @@ addresses:<br/>
 <p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US"><br/>
 </span></font><font color="#000000"><span lang="en-US"><b>9.</b></span></font><font color="#000000"><span lang="en-US">
 Netplan apply<br/>
-</span></font><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
+</span></font></p>
+<div class="command-card">
+    <h3>VM03 (AlmaLinux) — adresacja przez nmtui</h3>
+    <p>Na VM03 najpierw sprawdź interfejsy:</p>
+    <pre>ip a</pre>
+    <p>Potem uruchom:</p>
+    <pre>nmtui</pre>
+    <p>Wybierz:</p>
+    <pre>Edit a connection</pre>
+    <p>Jeżeli na liście nie ma profilu eth1, utwórz go tak:</p>
+    <pre>Add
+Ethernet
+Profile name: eth1
+Device: eth1</pre>
+    <p>Wypełnij IPv4:</p>
+    <pre>IPv4 CONFIGURATION: Manual
+Addresses: 10.13.12.13/24
+Gateway: 10.13.12.254
+DNS servers: 8.8.8.8</pre>
+    <p>Zaznacz:</p>
+    <pre>[X] Automatically connect
+[X] Available to all users</pre>
+    <p>Zapisz przez OK, potem przejdź do aktywacji:</p>
+    <pre>Back
+Activate a connection</pre>
+    <p>Przy eth1 ma być gwiazdka:</p>
+    <pre>* eth1</pre>
+    <p>Sprawdzenie:</p>
+    <pre>ip a
+ping 10.13.12.254</pre>
+</div>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
 <h2 id="nat" class="anchor-title">NAT + DNAT</h2>
 RTR  wprowadzamy <br/>
 echo 1 &gt;
@@ -1037,7 +1068,38 @@ addresses:<br/>
 <p style="line-height: 116%; margin-bottom: 0.11in"><font color="#ee0000"><span lang="en-US"><br/>
 </span></font><font color="#000000"><span lang="en-US"><b>9.</b></span></font><font color="#000000"><span lang="en-US">
 Netplan apply<br/>
-</span></font><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
+</span></font></p>
+<div class="command-card">
+    <h3>VM03 (AlmaLinux) — adresacja przez nmtui</h3>
+    <p>Na VM03 najpierw sprawdź interfejsy:</p>
+    <pre>ip a</pre>
+    <p>Potem uruchom:</p>
+    <pre>nmtui</pre>
+    <p>Wybierz:</p>
+    <pre>Edit a connection</pre>
+    <p>Jeżeli na liście nie ma profilu eth1, utwórz go tak:</p>
+    <pre>Add
+Ethernet
+Profile name: eth1
+Device: eth1</pre>
+    <p>Wypełnij IPv4:</p>
+    <pre>IPv4 CONFIGURATION: Manual
+Addresses: 10.13.12.13/24
+Gateway: 10.13.12.254
+DNS servers: 8.8.8.8</pre>
+    <p>Zaznacz:</p>
+    <pre>[X] Automatically connect
+[X] Available to all users</pre>
+    <p>Zapisz przez OK, potem przejdź do aktywacji:</p>
+    <pre>Back
+Activate a connection</pre>
+    <p>Przy eth1 ma być gwiazdka:</p>
+    <pre>* eth1</pre>
+    <p>Sprawdzenie:</p>
+    <pre>ip a
+ping 10.13.12.254</pre>
+</div>
+<p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
 RTR  wprowadzamy <br/>
 echo 1 &gt;
 /proc/sys/net/ipv4/ip_forward<br/>
@@ -1757,6 +1819,24 @@ exit</pre>
 show nat source rules
 show nat destination rules
 ping 8.8.8.8</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>VM05 (VyOS) — konfiguracja adresacji</h3>
+                <p>To jest wariant, gdy VM05 jest osobną maszyną na VyOS, a nie RTR. Najpierw wejdź w tryb konfiguracji:</p>
+                <pre>configure</pre>
+                <p>Przykład dla POD12:</p>
+                <pre>set interfaces ethernet eth1 address '10.13.12.253/24'
+set interfaces ethernet eth2 address '192.168.76.112/24'
+set protocols static route 0.0.0.0/0 next-hop '192.168.76.1'
+set system name-server '8.8.8.8'
+commit
+save
+exit</pre>
+                <p>Sprawdzenie po konfiguracji:</p>
+                <pre>show interfaces
+show ip route
+ping 10.13.12.254</pre>
             </div>
 
             <div class="vyos-warning">Najważniejsze: nie mieszaj. Debian RTR = iptables. VyOS RTR = set nat...</div>
