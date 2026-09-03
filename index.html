@@ -1961,6 +1961,19 @@ ping 10.13.12.254</pre>
                 <div class="command-card"><code>free -h</code><p>Pokazuje użycie pamięci RAM.</p></div>
             </div>
         </div>
+
+ <div class="command-group">
+            <h2>moje</h2>
+            <div class="command-grid">
+                <div class="command-card"><code>vm04 jak nie ma neta</code><p>echo "nameserver 8.8.8.8" > /etc/resolv.conf</p></div>
+                <div class="command-card"><code>porty na apache2</code><p>cat /etc/apache2/ports.conf dopisujemy Listen i port i poxniej restart apache2</p></div>
+                <div class="command-card"><code>jak cos braknie na hoscie</code><p>echo "VM02 - pod12.net" > /var/www/pod12.net/index.html</p></div>
+                <div class="command-card"><code>backup vm04</code><p>mkdir -p /backup     -vm04</p></div>
+                <div class="command-card"><code>znajdowanie i zapis</code><p>find /etc /var /home /root -type f -mmin -120 -print0 | tar --null -T - -cf /tmp/vm01.tar  -vm01</p></div>
+                <div class="command-card"><code>przesłanie na vm04</code><p>scp /tmp/vm01.tar root@10.13.12.254:/backup/</p></div>
+		<div class="command-card"><code>vm04 ssh</code><p></p>/etc/ssh/sshd_config PermitRootLogin yes systemctl restart ssh</div>
+            </div>
+        </div>
     </section>
 
 </body>
