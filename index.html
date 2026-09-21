@@ -2090,26 +2090,25 @@ tar -tzf /backup/vm02/vm02.tar.gz | head</pre>
         </div>
 
         <div class="command-group">
-            <h2>Wariant FTP — konfiguracja serwera na RTR</h2>
+            <h2>Wariant FTP — szybka wersja egzaminacyjna na koncie root</h2>
             <div class="command-card">
-                <p>Na RTR zainstaluj FTP i utwórz konto przeznaczone na archiwa:</p>
+                <p>Serwer FTP musi działać na maszynie odbierającej, czyli na RTR. Nie tworzysz dodatkowego konta — dopuszczasz do FTP istniejące konto <b>root</b>. Na RTR:</p>
                 <pre>apt update
 apt install vsftpd -y
-adduser --home /backup/ftp backupvm
-chmod 711 /backup
-chown -R backupvm:backupvm /backup/ftp
-chmod 750 /backup/ftp</pre>
-                <p>Ustaw hasło dla <b>backupvm</b>, a następnie skonfiguruj usługę:</p>
-                <pre>cat &gt;&gt; /etc/vsftpd.conf &lt;&lt;'EOF'
+mkdir -p /backup
+passwd root
+sed -i '/^root$/d' /etc/ftpusers
+sed -i '/^chroot_local_user=/d' /etc/vsftpd.conf
+cat &gt;&gt; /etc/vsftpd.conf &lt;&lt;'EOF'
 local_enable=YES
 write_enable=YES
-chroot_local_user=YES
-allow_writeable_chroot=YES
+chroot_local_user=NO
 local_umask=022
 EOF
 systemctl enable vsftpd
 systemctl restart vsftpd
 systemctl status vsftpd</pre>
+                <p><b>Dlaczego usuwamy root z /etc/ftpusers?</b> Ten plik jest listą kont zablokowanych dla FTP. Dopóki znajduje się tam root, poprawne hasło i tak zostanie odrzucone.</p>
             </div>
         </div>
 
@@ -2119,8 +2118,9 @@ systemctl status vsftpd</pre>
                 <p>Jeżeli archiwum nie zostało jeszcze utworzone, wykonaj najpierw komendę <b>find ... | tar ...</b> z wariantu SCP. Potem na VM01:</p>
                 <pre>apt install ftp -y
 ftp 10.41.12.254</pre>
-                <p>Zaloguj się jako <b>backupvm</b>, a po zalogowaniu wpisz:</p>
+                <p>Gdy klient zapyta o nazwę użytkownika, wpisz <b>root</b> i podaj hasło roota ustawione na RTR. Następnie:</p>
                 <pre>binary
+cd /backup
 put /tmp/vm01.tar.gz vm01.tar.gz
 ls
 bye</pre>
@@ -2132,8 +2132,9 @@ bye</pre>
             <div class="command-card">
                 <pre>apt install ftp -y
 ftp 10.41.12.254</pre>
-                <p>Zaloguj się jako <b>backupvm</b>, a po zalogowaniu wpisz:</p>
+                <p>Zaloguj się jako <b>root</b> hasłem z RTR. Następnie:</p>
                 <pre>binary
+cd /backup
 put /tmp/vm02.tar.gz vm02.tar.gz
 ls
 bye</pre>
@@ -2144,13 +2145,13 @@ bye</pre>
             <h2>Sprawdzenie plików przesłanych przez FTP</h2>
             <div class="command-card">
                 <p>Na RTR:</p>
-                <pre>ls -lh /backup/ftp/
-tar -tzf /backup/ftp/vm01.tar.gz | head
-tar -tzf /backup/ftp/vm02.tar.gz | head</pre>
+                <pre>ls -lh /backup/
+tar -tzf /backup/vm01.tar.gz | head
+tar -tzf /backup/vm02.tar.gz | head</pre>
             </div>
         </div>
 
-        <div class="vyos-warning">Najprostszy wariant egzaminacyjny to SCP: nie wymaga osobnego serwera FTP na RTR i szyfruje transmisję. Wariant FTP wykonuj tylko wtedy, gdy treść zadania wyraźnie tego wymaga.</div>
+        <div class="vyos-warning">Na egzaminie wybierz SCP, jeśli zadanie nie narzuca FTP — jest krócej. Logowanie root przez zwykły FTP stosuj tylko w odizolowanym laboratorium, bo hasło nie jest szyfrowane.</div>
     </section>
 
     <hr class="section-divider">
