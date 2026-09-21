@@ -164,7 +164,9 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
             <a href="#dhcp">DHCP</a>
             <a href="#nginx-klasyczna">Nginx klasyczna</a>
             <a href="#nginx-aliasy">Nginx aliasy</a>
-        
+            <a href="#apache-loadbalancer">Apache LB</a>
+            <a href="#ftp">FTP</a>
+            <a href="#archiwizacja">Archiwizacja</a>
             <a href="#vyos">VyOS</a>
             <a href="#komendy">Komendy</a></div>
     </div>
@@ -1841,6 +1843,314 @@ ping 10.13.12.254</pre>
 
             <div class="vyos-warning">Najważniejsze: nie mieszaj. Debian RTR = iptables. VyOS RTR = set nat...</div>
         </div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section id="apache-loadbalancer" class="doc-section">
+        <h1 class="big-title">APACHE JAKO LOAD BALANCER NA RTR — PORT 8810</h1>
+        <div class="subnote">Wariant egzaminacyjny: Apache działa na RTR i rozdziela zapytania pomiędzy serwery WWW na VM01 i VM02. Poniższy przykład używa adresów 10.41.12.201 i 10.41.12.202 oraz portu 8810.</div>
+
+        <div class="command-group">
+            <h2>1. Najpierw sprawdź serwery WWW</h2>
+            <div class="command-card">
+                <p>Na VM01 i VM02 Apache albo Nginx musi już odpowiadać na porcie 80. Na RTR sprawdź:</p>
+                <pre>curl http://10.41.12.201
+curl http://10.41.12.202</pre>
+                <p>Odpowiedzi powinny być różne, np. <b>VM01</b> i <b>VM02</b>. Dzięki temu podczas testu zobaczysz przełączanie serwerów.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>2. Instalacja Apache na RTR</h2>
+            <div class="command-card">
+                <pre>apt update
+apt install apache2 curl -y
+systemctl enable apache2
+systemctl start apache2</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>3. Włączenie modułów load balancera</h2>
+            <div class="command-card">
+                <pre>a2enmod proxy
+a2enmod proxy_http
+a2enmod proxy_balancer
+a2enmod lbmethod_byrequests
+a2enmod slotmem_shm</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>4. Dodanie portu 8810</h2>
+            <div class="command-card">
+                <p>Komenda dopisze <b>Listen 8810</b> tylko wtedy, gdy takiego wpisu jeszcze nie ma:</p>
+                <pre>grep -qxF 'Listen 8810' /etc/apache2/ports.conf || echo 'Listen 8810' &gt;&gt; /etc/apache2/ports.conf</pre>
+                <p>Kontrola:</p>
+                <pre>cat /etc/apache2/ports.conf</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>5. Konfiguracja load balancera</h2>
+            <div class="command-card">
+                <p>Na RTR wklej całość:</p>
+                <pre>cat &gt; /etc/apache2/sites-available/loadbalancer-8810.conf &lt;&lt;'EOF'
+&lt;VirtualHost *:8810&gt;
+    ProxyPreserveHost On
+
+    &lt;Proxy "balancer://vmki"&gt;
+        BalancerMember "http://10.41.12.201:80"
+        BalancerMember "http://10.41.12.202:80"
+        ProxySet lbmethod=byrequests
+    &lt;/Proxy&gt;
+
+    ProxyPass        "/" "balancer://vmki/"
+    ProxyPassReverse "/" "balancer://vmki/"
+&lt;/VirtualHost&gt;
+EOF</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>6. Włączenie i sprawdzenie</h2>
+            <div class="command-card">
+                <pre>a2ensite loadbalancer-8810.conf
+apache2ctl configtest
+systemctl restart apache2
+systemctl status apache2
+ss -tulpn | grep 8810</pre>
+                <p>Przy <b>apache2ctl configtest</b> ma być: <b>Syntax OK</b>.</p>
+            </div>
+            <div class="command-card">
+                <h3>Test round-robin na RTR</h3>
+                <pre>curl http://localhost:8810
+curl http://localhost:8810
+curl http://localhost:8810
+curl http://localhost:8810</pre>
+                <p>Powinny pojawiać się na zmianę odpowiedzi z VM01 i VM02. Z innej maszyny możesz testować przez:</p>
+                <pre>curl http://10.41.12.254:8810</pre>
+            </div>
+        </div>
+
+        <div class="vyos-warning">Ten wariant wykonujesz tylko wtedy, gdy RTR jest Debianem/Ubuntu. Na czystym VyOS nie zainstalujesz Apache poleceniem apt.</div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section id="ftp" class="doc-section">
+        <h1 class="big-title">FTP — VM01 I VM02</h1>
+        <div class="subnote">Zadanie 5: na VM01 i VM02 uruchomić FTP, utworzyć użytkowników domena1, domena2 i domena3 oraz zapewnić każdemu dostęp do jego katalogu domowego.</div>
+
+        <div class="command-group">
+            <h2>1. Instalacja na VM01 i VM02</h2>
+            <div class="command-card">
+                <p>Wykonaj ten sam zestaw najpierw na VM01, a potem na VM02:</p>
+                <pre>apt update
+apt install vsftpd ftp -y
+cp /etc/vsftpd.conf /etc/vsftpd.conf.bak</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>2. Konfiguracja vsftpd</h2>
+            <div class="command-card">
+                <p>Na VM01 i VM02 dopisz ustawienia:</p>
+                <pre>cat &gt;&gt; /etc/vsftpd.conf &lt;&lt;'EOF'
+local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+local_umask=022
+EOF</pre>
+                <p>Najważniejsze: <b>local_enable</b> pozwala logować lokalnych użytkowników, <b>write_enable</b> pozwala wysyłać pliki, a <b>chroot_local_user</b> zamyka użytkownika w jego katalogu domowym.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>3. Konta domena1, domena2, domena3</h2>
+            <div class="command-card">
+                <p>Na VM01 i VM02 utwórz trzy konta. Przy każdym poleceniu ustaw hasło; pozostałe pytania możesz zatwierdzić klawiszem ENTER:</p>
+                <pre>adduser domena1
+adduser domena2
+adduser domena3</pre>
+                <p>Powstaną katalogi:</p>
+                <pre>/home/domena1
+/home/domena2
+/home/domena3</pre>
+                <p>Dodaj pliki testowe, żeby od razu rozpoznać wybrane konto i maszynę:</p>
+                <pre>echo "VM01 - domena1" &gt; /home/domena1/VM01-domena1.txt
+echo "VM01 - domena2" &gt; /home/domena2/VM01-domena2.txt
+echo "VM01 - domena3" &gt; /home/domena3/VM01-domena3.txt
+chown domena1:domena1 /home/domena1/VM01-domena1.txt
+chown domena2:domena2 /home/domena2/VM01-domena2.txt
+chown domena3:domena3 /home/domena3/VM01-domena3.txt</pre>
+                <p>Na VM02 wykonaj analogicznie, zmieniając w nazwach i treści <b>VM01</b> na <b>VM02</b>.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>4. Uruchomienie FTP</h2>
+            <div class="command-card">
+                <pre>systemctl enable vsftpd
+systemctl restart vsftpd
+systemctl status vsftpd
+ss -tulpn | grep :21</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>5. Test logowania i wysyłania pliku</h2>
+            <div class="command-card">
+                <p>Połącz się z VM01:</p>
+                <pre>ftp 10.41.12.201</pre>
+                <p>Podaj użytkownika, np. <b>domena1</b>, i jego hasło. Po zalogowaniu:</p>
+                <pre>pwd
+ls
+put plik-testowy.txt
+ls
+bye</pre>
+                <p>VM02 testujesz tak samo:</p>
+                <pre>ftp 10.41.12.202</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Wariant: katalog domowy ma być katalogiem strony WWW</h2>
+            <div class="command-card">
+                <p>Jeżeli prowadzący wskaże, że użytkownik FTP ma trafiać bezpośrednio do katalogu konkretnej domeny, zmień mu katalog domowy. Przykład:</p>
+                <pre>usermod -d /var/www/12.net domena1
+chown -R domena1:www-data /var/www/12.net
+chmod -R 775 /var/www/12.net</pre>
+                <p>Dla kolejnych użytkowników podstaw właściwe katalogi domen. Sprawdzenie:</p>
+                <pre>getent passwd domena1</pre>
+            </div>
+        </div>
+
+        <div class="vyos-warning">Zwykły FTP przesyła hasło bez szyfrowania. To konfiguracja do zamkniętego laboratorium; poza labem bezpieczniejszy jest SFTP działający przez SSH.</div>
+    </section>
+
+    <hr class="section-divider">
+
+    <section id="archiwizacja" class="doc-section">
+        <h1 class="big-title">ARCHIWIZACJA PLIKÓW Z VM01 I VM02 NA RTR</h1>
+        <div class="subnote">Schemat: na każdej VM wyszukaj pliki zmienione w ostatnich 120 minut, utwórz archiwum, a następnie prześlij je do katalogu /backup na RTR. Masz dwa warianty: SCP albo FTP.</div>
+
+        <div class="command-group">
+            <h2>1. Przygotowanie RTR</h2>
+            <div class="command-card">
+                <p>Na RTR:</p>
+                <pre>mkdir -p /backup/vm01
+mkdir -p /backup/vm02
+chmod 700 /backup /backup/vm01 /backup/vm02</pre>
+                <p>Do wariantu SCP upewnij się, że na RTR działa SSH:</p>
+                <pre>apt install openssh-server -y
+systemctl enable ssh
+passwd root
+nano /etc/ssh/sshd_config</pre>
+                <p>W pliku ustaw albo dopisz:</p>
+                <pre>PermitRootLogin yes
+PasswordAuthentication yes</pre>
+                <p>Zapisz plik i uruchom ponownie SSH:</p>
+                <pre>systemctl restart ssh
+systemctl status ssh</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>2A. VM01 — archiwum i wysłanie bezpośrednio przez SCP</h2>
+            <div class="command-card">
+                <p>Na VM01:</p>
+                <pre>find /etc /var /home /root -type f -mmin -120 -print0 | tar --null -T - -czf /tmp/vm01.tar.gz
+ls -lh /tmp/vm01.tar.gz
+scp /tmp/vm01.tar.gz root@10.41.12.254:/backup/vm01/</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>2B. VM02 — archiwum i wysłanie bezpośrednio przez SCP</h2>
+            <div class="command-card">
+                <p>Na VM02:</p>
+                <pre>find /etc /var /home /root -type f -mmin -120 -print0 | tar --null -T - -czf /tmp/vm02.tar.gz
+ls -lh /tmp/vm02.tar.gz
+scp /tmp/vm02.tar.gz root@10.41.12.254:/backup/vm02/</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>3. Sprawdzenie archiwów na RTR</h2>
+            <div class="command-card">
+                <pre>ls -lh /backup/vm01/
+ls -lh /backup/vm02/
+tar -tzf /backup/vm01/vm01.tar.gz | head
+tar -tzf /backup/vm02/vm02.tar.gz | head</pre>
+                <p>Jeżeli listy plików się wyświetlą, archiwa są poprawne.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Wariant FTP — konfiguracja serwera na RTR</h2>
+            <div class="command-card">
+                <p>Na RTR zainstaluj FTP i utwórz konto przeznaczone na archiwa:</p>
+                <pre>apt update
+apt install vsftpd -y
+adduser --home /backup/ftp backupvm
+chmod 711 /backup
+chown -R backupvm:backupvm /backup/ftp
+chmod 750 /backup/ftp</pre>
+                <p>Ustaw hasło dla <b>backupvm</b>, a następnie skonfiguruj usługę:</p>
+                <pre>cat &gt;&gt; /etc/vsftpd.conf &lt;&lt;'EOF'
+local_enable=YES
+write_enable=YES
+chroot_local_user=YES
+allow_writeable_chroot=YES
+local_umask=022
+EOF
+systemctl enable vsftpd
+systemctl restart vsftpd
+systemctl status vsftpd</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>VM01 — wysłanie archiwum przez FTP</h2>
+            <div class="command-card">
+                <p>Jeżeli archiwum nie zostało jeszcze utworzone, wykonaj najpierw komendę <b>find ... | tar ...</b> z wariantu SCP. Potem na VM01:</p>
+                <pre>apt install ftp -y
+ftp 10.41.12.254</pre>
+                <p>Zaloguj się jako <b>backupvm</b>, a po zalogowaniu wpisz:</p>
+                <pre>binary
+put /tmp/vm01.tar.gz vm01.tar.gz
+ls
+bye</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>VM02 — wysłanie archiwum przez FTP</h2>
+            <div class="command-card">
+                <pre>apt install ftp -y
+ftp 10.41.12.254</pre>
+                <p>Zaloguj się jako <b>backupvm</b>, a po zalogowaniu wpisz:</p>
+                <pre>binary
+put /tmp/vm02.tar.gz vm02.tar.gz
+ls
+bye</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Sprawdzenie plików przesłanych przez FTP</h2>
+            <div class="command-card">
+                <p>Na RTR:</p>
+                <pre>ls -lh /backup/ftp/
+tar -tzf /backup/ftp/vm01.tar.gz | head
+tar -tzf /backup/ftp/vm02.tar.gz | head</pre>
+            </div>
+        </div>
+
+        <div class="vyos-warning">Najprostszy wariant egzaminacyjny to SCP: nie wymaga osobnego serwera FTP na RTR i szyfruje transmisję. Wariant FTP wykonuj tylko wtedy, gdy treść zadania wyraźnie tego wymaga.</div>
     </section>
 
     <hr class="section-divider">
