@@ -165,6 +165,7 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
             <a href="#nginx-klasyczna">Nginx klasyczna</a>
             <a href="#nginx-aliasy">Nginx aliasy</a>
             <a href="#apache-loadbalancer">Apache LB</a>
+            <a href="#nginx-loadbalancer">Nginx LB</a>
             <a href="#ftp">FTP</a>
             <a href="#archiwizacja">Archiwizacja</a>
             <a href="#vyos">VyOS</a>
@@ -314,6 +315,14 @@ Activate a connection</pre>
     <p>Sprawdzenie:</p>
     <pre>ip a
 ping 10.13.12.254</pre>
+</div>
+<div class="command-card">
+    <h3>RTR — zapis konfiguracji maskarady w /etc/nat.sh</h3>
+    <p>Otwórz plik:</p>
+    <pre>nano /etc/nat.sh</pre>
+    <p>Tam wklej całą konfigurację maskarady / NAT.</p>
+    <p>Po zapisaniu uruchom:</p>
+    <pre>bash /etc/nat.sh</pre>
 </div>
 <p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
 <h2 id="nat" class="anchor-title">NAT + DNAT</h2>
@@ -824,6 +833,34 @@ nmcli con show<br/>
 powinien bycc przydzielony adres z
 dhcp<br/>
 -------------------------------------------------</font></p>
+<div class="command-group">
+    <h2>Rezerwacja adresu DHCP dla VM03 — wariant POD112</h2>
+    <div class="command-card">
+        <p>Na VM03 sprawdź adres MAC interfejsu <b>eth1</b>. W tym przykładzie:</p>
+        <pre>00:15:5d:04:49:ea</pre>
+        <p>Na RTR otwórz konfigurację DHCP:</p>
+        <pre>nano /etc/dhcp/dhcpd.conf</pre>
+        <p>Na końcu pliku dopisz:</p>
+        <pre>host vm03 {
+    hardware ethernet 00:15:5d:04:49:ea;
+    fixed-address 10.100.112.245;
+}</pre>
+        <p><b>Uwaga:</b> adres rezerwacji musi należeć do tej samej podsieci, którą obsługuje DHCP. Dla tego przykładu POD112 jest to 10.100.112.0/24.</p>
+        <p>Sprawdź składnię i zrestartuj usługę:</p>
+        <pre>dhcpd -t -cf /etc/dhcp/dhcpd.conf
+systemctl restart isc-dhcp-server</pre>
+    </div>
+    <div class="command-card">
+        <h3>VM03 — przełączenie eth1 na DHCP</h3>
+        <pre>nmtui</pre>
+        <p>Wejdź w <b>Edit a connection → eth1</b> i ustaw IPv4 na <b>Automatic</b>. Zapisz przez OK i wyjdź.</p>
+        <p>Następnie:</p>
+        <pre>systemctl restart NetworkManager
+ip a</pre>
+        <p>VM03 powinna dostać zarezerwowany adres <b>10.100.112.245</b>.</p>
+    </div>
+</div>
+
 <p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000">—
 </font><h2 id="nginx-klasyczna" class="anchor-title">Nginx - wersja klasyczna</h2>
 <font color="#000000"><b>zadanie 2 na Nginx</b></font><font color="#000000">
@@ -1843,6 +1880,79 @@ ping 10.13.12.254</pre>
 
             <div class="vyos-warning">Najważniejsze: nie mieszaj. Debian RTR = iptables. VyOS RTR = set nat...</div>
         </div>
+
+        <div class="command-group">
+            <h2>Data 25092026 — VyOS</h2>
+            <div class="command-card">
+                <h3>Zrobienie routera — adresacja</h3>
+                <pre>configure
+set interfaces ethernet eth1 address '10.100.112.253/24'
+set interfaces ethernet eth2 address '192.168.76.212/24'
+set protocols static route 0.0.0.0/0 next-hop '192.168.76.1'
+set system name-server '8.8.8.8'
+commit
+save
+show interfaces
+show ip route</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Maskarada</h3>
+                <pre>configure
+set nat source rule 100 source address 10.100.112.0/24
+set nat source rule 100 outbound-interface name eth2
+set nat source rule 100 translation address masquerade
+commit
+save
+exit</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Na VM01 i 02 w razie internet nie działa</h3>
+                <pre>echo "nameserver 8.8.8.8" &gt; /etc/resolv.conf</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Porty</h3>
+                <pre>configure
+vm01
+set nat destination rule 10 inbound-interface name eth2
+set nat destination rule 10 protocol tcp
+set nat destination rule 10 destination port 4401
+set nat destination rule 10 translation address 10.100.112.1
+set nat destination rule 10 translation port 22
+
+set nat destination rule 20 inbound-interface name eth2
+set nat destination rule 20 protocol tcp
+set nat destination rule 20 destination port 2202
+set nat destination rule 20 translation address 10.100.112.1
+set nat destination rule 20 translation port 800
+
+vm02
+set nat destination rule 30 inbound-interface name eth2
+set nat destination rule 30 protocol tcp
+set nat destination rule 30 destination port 5011
+set nat destination rule 30 translation address 10.100.112.2
+set nat destination rule 30 translation port 22
+
+set nat destination rule 40 inbound-interface name eth2
+set nat destination rule 40 protocol tcp
+set nat destination rule 40 destination port 7002
+set nat destination rule 40 translation address 10.100.112.2
+set nat destination rule 40 translation port 800
+
+vm03
+set nat destination rule 50 inbound-interface name eth2
+set nat destination rule 50 protocol tcp
+set nat destination rule 50 destination port 7003
+set nat destination rule 50 translation address 10.100.112.3
+set nat destination rule 50 translation port 22
+
+commit save exit
+show nat destination rules</pre>
+            </div>
+        </div>
+
     </section>
 
     <hr class="section-divider">
@@ -1935,6 +2045,148 @@ curl http://localhost:8810</pre>
         </div>
 
         <div class="vyos-warning">Ten wariant wykonujesz tylko wtedy, gdy RTR jest Debianem/Ubuntu. Na czystym VyOS nie zainstalujesz Apache poleceniem apt.</div>
+
+        <div class="command-group">
+            <h2>Data 25092026 — loadbalancer Apache</h2>
+            <div class="command-card">
+                <pre>apt update
+apt install apache2 -y
+a2enmod proxy
+a2enmod proxy_http
+a2enmod proxy_balancer
+a2enmod lbmethod_byrequests
+
+nano /etc/apache2/ports.conf
+Listen 88
+
+cat &gt; /etc/apache2/sites-available/balancer.conf &lt;&lt;'EOF'
+&lt;VirtualHost *:88&gt;
+
+    ProxyPreserveHost On
+
+    &lt;Proxy "balancer://web"&gt;
+        BalancerMember "http://10.100.112.11:1820"
+        BalancerMember "http://10.100.112.12:1820"
+        ProxySet lbmethod=byrequests
+    &lt;/Proxy&gt;
+
+    ProxyPass "/" "balancer://web/"
+    ProxyPassReverse "/" "balancer://web/"
+
+&lt;/VirtualHost&gt;
+EOF
+
+a2ensite balancer.conf
+apache2ctl configtest
+systemctl restart apache2
+
+test curl -H "Host: pod112.net" http://10.100.112.11:1820
+curl -H "Host: pod112.net" http://10.100.112.12:1820</pre>
+            </div>
+        </div>
+
+    </section>
+
+    <hr class="section-divider">
+
+    <section id="nginx-loadbalancer" class="doc-section">
+        <h1 class="big-title">NGINX JAKO LOAD BALANCER — PORT 78</h1>
+        <div class="subnote">Wariant POD112: Nginx działa jako load balancer, nasłuchuje na porcie 78 i przekazuje ruch do Apache na VM01 i VM02 na porcie 800.</div>
+
+        <div class="command-group">
+            <h2>1. VM01 i VM02 — przenieś Apache na port 800</h2>
+            <div class="command-card">
+                <p>Na obu maszynach otwórz:</p>
+                <pre>nano /etc/apache2/ports.conf</pre>
+                <p>Ustaw nasłuch:</p>
+                <pre>Listen 800</pre>
+                <p>Jeżeli korzystasz z głównego vhosta, otwórz:</p>
+                <pre>nano /etc/apache2/sites-available/000-default.conf</pre>
+                <p>i zmień początek na:</p>
+                <pre>&lt;VirtualHost *:800&gt;</pre>
+                <p>Jeżeli masz inne aktywne VirtualHosty, które mają działać jako backend, w nich również zmień <b>*:80</b> na <b>*:800</b>.</p>
+                <p>Na końcu sprawdź i przeładuj Apache:</p>
+                <pre>apache2ctl configtest
+systemctl restart apache2
+ss -lntp | grep :800</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>2. Jeżeli na VM01 / VM02 działa też Nginx — przenieś go na 1820</h2>
+            <div class="command-card">
+                <p>Otwórz domyślną konfigurację:</p>
+                <pre>nano /etc/nginx/sites-available/default</pre>
+                <p>Ustaw poprawnie port dla IPv4 i IPv6:</p>
+                <pre>listen 1820 default_server;
+listen [::]:1820 default_server;</pre>
+                <p>Sprawdzenie i przeładowanie:</p>
+                <pre>nginx -t
+systemctl reload nginx
+ss -lntp | grep :1820</pre>
+                <p><b>Poprawka:</b> w pierwszej linii nie może być <code>listen [::]1820</code>. Dla IPv4 ma być <code>listen 1820</code>, a dla IPv6 <code>listen [::]:1820</code>.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>3. Instalacja Nginx na maszynie load balancera</h2>
+            <div class="command-card">
+                <pre>apt update
+apt install nginx curl -y</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>4. Konfiguracja load balancera</h2>
+            <div class="command-card">
+                <p>Utwórz plik:</p>
+                <pre>nano /etc/nginx/sites-available/balancer</pre>
+                <p>Wklej:</p>
+                <pre>upstream web_backend {
+    server 10.100.112.11:800;
+    server 10.100.112.12:800;
+}
+
+server {
+    listen 78;
+
+    location / {
+        proxy_pass http://web_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}</pre>
+                <p>Dodałem <b>X-Forwarded-For</b>, żeby backend dostał również poprawny łańcuch adresów klienta.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>5. Włączenie konfiguracji i restart</h2>
+            <div class="command-card">
+                <pre>ln -s /etc/nginx/sites-available/balancer /etc/nginx/sites-enabled/
+nginx -t
+systemctl restart nginx
+ss -lntp | grep :78</pre>
+                <p>Jeżeli link już istnieje, nie twórz go drugi raz. Najważniejsze jest, żeby <b>nginx -t</b> zakończyło się komunikatem o poprawnej składni.</p>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>6. Test backendów i load balancera</h2>
+            <div class="command-card">
+                <p>Najpierw sprawdź oba backendy bezpośrednio:</p>
+                <pre>curl -H "Host: pod112.oblog.pl" http://10.100.112.11:800
+curl -H "Host: pod112.oblog.pl" http://10.100.112.12:800</pre>
+                <p>Potem test load balancera:</p>
+                <pre>curl -H "Host: pod112.oblog.pl" http://localhost:78
+curl -H "Host: pod112.oblog.pl" http://localhost:78
+curl -H "Host: pod112.oblog.pl" http://localhost:78</pre>
+                <p>Jeżeli strony VM01 i VM02 mają różną treść, kolejne wywołania powinny pokazywać rozdzielanie ruchu pomiędzy backendami.</p>
+            </div>
+        </div>
+
+        <div class="vyos-warning">Jeżeli load balancer stoi na tej samej maszynie, na której działa już inny Nginx, upewnij się, że żadna inna konfiguracja nie nasłuchuje na porcie 78.</div>
     </section>
 
     <hr class="section-divider">
