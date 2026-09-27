@@ -169,7 +169,8 @@ mark{background:#fff176;color:#000;padding:0 2px;border-radius:3px}
             <a href="#ftp">FTP</a>
             <a href="#archiwizacja">Archiwizacja</a>
             <a href="#vyos">VyOS</a>
-            <a href="#komendy">Komendy</a></div>
+            <a href="#komendy">Komendy</a>
+            <a href="#konfiguracja-portow">Konfiguracja portów</a></div>
     </div>
     <section id="sekcja1" class="doc-section"><h1 class="big-title">SKRÓCONA INSTRUKCJA - WERSJA PIERWSZA</h1><h2 id="adresacja" class="anchor-title">Adresacja - RTR, VM01, VM02</h2><p style="line-height: 116%; margin-bottom: 0.11in">
 <img class="doc-image" height="193" src="img/obraz_01.png" width="605"/>
@@ -2535,6 +2536,157 @@ tar -tzf /backup/vm02.tar.gz | head</pre>
                 <div class="command-card"><code>znajdowanie i zapis</code><p>find /etc /var /home /root -type f -mmin -120 -print0 | tar --null -T - -cf /tmp/vm01.tar  -vm01</p></div>
                 <div class="command-card"><code>przesłanie na vm04</code><p>scp /tmp/vm01.tar root@10.13.12.254:/backup/</p></div>
 		<div class="command-card"><code>vm04 ssh</code><p></p>/etc/ssh/sshd_config PermitRootLogin yes systemctl restart ssh</div>
+            </div>
+        </div>
+    </section>
+
+
+    <hr class="section-divider">
+    <section id="konfiguracja-portow" class="doc-section">
+        <h1 class="big-title">KONFIGURACJA PORTÓW</h1>
+
+        <div class="command-group">
+            <h2>Apache — konfiguracja portów</h2>
+
+            <div class="command-card">
+                <h3>Na VM — Apache → port 800</h3>
+                <pre>nano /etc/apache2/ports.conf
+Listen 800
+
+nano /etc/apache2/sites-available/000-default.conf</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>W domenach</h3>
+                <pre>&lt;VirtualHost *:800&gt;
+    DocumentRoot /var/www/html
+&lt;/VirtualHost&gt;</pre>
+                <pre>apache2ctl configtest
+systemctl restart apache2</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Apache jako loadbalancer</h3>
+                <p><b>VM01 Nginx → 1820</b><br>
+                <b>VM02 Nginx → 1820</b><br>
+                <b>RTR Apache LB → 88</b></p>
+                <pre>a2enmod proxy
+a2enmod proxy_http
+a2enmod proxy_balancer
+a2enmod lbmethod_byrequests
+
+nano /etc/apache2/ports.conf
+Listen 88</pre>
+                <pre>cat &gt; /etc/apache2/sites-available/balancer.conf &lt;&lt;'EOF'
+&lt;VirtualHost *:88&gt;
+
+    ProxyPreserveHost On
+
+    &lt;Proxy "balancer://web"&gt;
+        BalancerMember "http://10.100.112.11:1820"
+        BalancerMember "http://10.100.112.12:1820"
+        ProxySet lbmethod=byrequests
+    &lt;/Proxy&gt;
+
+    ProxyPass "/" "balancer://web/"
+    ProxyPassReverse "/" "balancer://web/"
+
+&lt;/VirtualHost&gt;
+EOF</pre>
+                <pre>a2ensite balancer.conf
+apache2ctl configtest
+systemctl restart apache2</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>Nginx — konfiguracja portu</h2>
+
+            <div class="command-card">
+                <h3>Na VM — Nginx na VM01 i VM02 → port 1820</h3>
+                <pre>nano /etc/nginx/sites-available/default</pre>
+                <pre>server {
+    listen 1820 default_server;
+    listen [::]:1820 default_server;
+
+    root /var/www/html;
+    index index.html;
+
+    server_name _;
+}</pre>
+                <pre>nginx -t
+systemctl reload nginx</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Domena</h3>
+                <pre>cat &gt; /etc/nginx/sites-available/pod112.net &lt;&lt;'EOF'
+server {
+    listen 1820;
+    server_name pod112.net;
+    root /var/www/pod112.net;
+    index index.html;
+}
+EOF</pre>
+                <pre>ln -s /etc/nginx/sites-available/pod112.net /etc/nginx/sites-enabled/
+nginx -t
+systemctl reload nginx</pre>
+            </div>
+
+            <div class="command-card">
+                <h3>Nginx jako loadbalancer</h3>
+                <p><b>VM01 Nginx → 1820</b><br>
+                <b>VM02 Nginx → 1820</b><br>
+                <b>RTR Nginx LB → port 78</b></p>
+                <pre>cat &gt; /etc/nginx/sites-available/balancer &lt;&lt;'EOF'
+upstream web_backend {
+    server 10.100.112.11:1820;
+    server 10.100.112.12:1820;
+}
+
+server {
+    listen 78;
+
+    location / {
+        proxy_pass http://web_backend;
+        proxy_set_header Host $host;
+    }
+}
+EOF</pre>
+                <pre>ln -s /etc/nginx/sites-available/balancer /etc/nginx/sites-enabled/
+nginx -t
+systemctl restart nginx</pre>
+            </div>
+        </div>
+
+        <div class="command-group">
+            <h2>HAProxy</h2>
+            <div class="command-card">
+                <h3>RTR — HAProxy → port 98</h3>
+                <p><b>HAProxy RTR → port 98</b><br>
+                <b>VM01 Apache/Nginx → 82</b><br>
+                <b>VM02 Apache/Nginx → 82</b></p>
+                <pre>nano /etc/haproxy/haproxy.cfg</pre>
+                <pre>global
+    log /dev/log local0
+    daemon
+
+defaults
+    mode http
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
+
+frontend http_front
+    bind *:98
+    default_backend web_servers
+
+backend web_servers
+    balance roundrobin
+    server vm01 10.100.112.11:82 check
+    server vm02 10.100.112.12:82 check</pre>
+                <pre>haproxy -c -f /etc/haproxy/haproxy.cfg
+systemctl restart haproxy</pre>
             </div>
         </div>
     </section>
