@@ -317,14 +317,6 @@ Activate a connection</pre>
     <pre>ip a
 ping 10.13.12.254</pre>
 </div>
-<div class="command-card">
-    <h3>RTR — zapis konfiguracji maskarady w /etc/nat.sh</h3>
-    <p>Otwórz plik:</p>
-    <pre>nano /etc/nat.sh</pre>
-    <p>Tam wklej całą konfigurację maskarady / NAT.</p>
-    <p>Po zapisaniu uruchom:</p>
-    <pre>bash /etc/nat.sh</pre>
-</div>
 <p style="line-height: 116%; margin-bottom: 0.11in"><font color="#000000"><span lang="en-US"><b>10.</b></span></font><font color="#000000"><span lang="en-US">
 <h2 id="nat" class="anchor-title">NAT + DNAT</h2>
 RTR  wprowadzamy <br/>
@@ -352,6 +344,36 @@ iptables
 iptables -t nat -A PREROUTING -i eth2 -p tcp
 --dport 8762 -j DNAT --to 10.41.12.202:80<br/>
 <br/>
+
+<div class="command-card">
+    <h3>RTR — zapis konfiguracji maskarady w /etc/nat.sh</h3>
+    <p>Otwórz plik:</p>
+    <pre>nano /etc/nat.sh</pre>
+    <p>Tam wklej całą konfigurację maskarady / NAT.</p>
+    <p>Po zapisaniu uruchom:</p>
+    <pre>bash /etc/nat.sh</pre>
+</div>
+<div class="command-card">
+    <h3>SNAT — wariant zamiast MASQUERADE</h3>
+    <p>Jeżeli w zadaniu zamiast maskarady (MASQUERADE) ma być <b>SNAT</b>, w pliku <b>/etc/nat.sh</b> użyj:</p>
+    <pre>#!/bin/bash
+
+echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+iptables -t nat -F
+iptables -F
+
+iptables -t nat -A POSTROUTING -s 10.41.12.0/24 -o eth2 -j SNAT --to-source 192.168.76.12
+
+iptables -A FORWARD -i eth1 -o eth2 -j ACCEPT
+iptables -A FORWARD -i eth2 -o eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 3301 -j DNAT --to 10.41.12.201:22
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 1102 -j DNAT --to 10.41.12.202:22
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 5011 -j DNAT --to 10.41.12.201:80
+iptables -t nat -A PREROUTING -i eth2 -p tcp --dport 8762 -j DNAT --to 10.41.12.202:80</pre>
+    <p><b>Różnica:</b> zamiast <code>-j MASQUERADE</code> jest <code>-j SNAT --to-source 192.168.76.12</code>. Adresacji RTR i VM-ek nie zmieniasz.</p>
+</div>
 </span></font><font color="#000000"><span lang="en-US"><b>11</b></span></font><font color="#000000"><span lang="en-US">
 <h2 id="ssh" class="anchor-title">SSH</h2>
 DZIAŁANIE SSH – ustawiamy na vm01 I vm02 logowanie<br/>
