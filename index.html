@@ -1839,6 +1839,14 @@ set nat source rule 10 translation address 'masquerade'</pre>
             </div>
 
             <div class="command-card">
+                <h3>SNAT — OPCJONALNIE (zamiast MASQUERADE)</h3>
+                <p><b>Opcjonalnie:</b> jeśli w zadaniu jest wymagany SNAT zamiast MASQUERADE, użyj stałego adresu WAN VyOS <b>192.168.76.12</b>. Pozostałe reguły DNAT do VM01 i VM02 zostają bez zmian.</p>
+                <pre>set nat source rule 10 outbound-interface name 'eth2'
+set nat source rule 10 source address '10.41.12.0/24'
+set nat source rule 10 translation address '192.168.76.12'</pre>
+            </div>
+
+            <div class="command-card">
                 <h3>DNAT — SSH do VM01 i VM02</h3>
                 <pre>set nat destination rule 10 inbound-interface name 'eth2'
 set nat destination rule 10 protocol 'tcp'
